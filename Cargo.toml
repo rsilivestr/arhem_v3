@@ -1,0 +1,12 @@
+[package]
+name = "arhem_v3"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sqlx ={version =  "0.8.2", features = ["postgres", "chrono", "runtime-async-std", "runtime-tokio" ]}
+dotenv = "0.15"
+rocket = {version = "0.5.1", features = ["json"]}
+
