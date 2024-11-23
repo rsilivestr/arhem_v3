@@ -4,13 +4,13 @@ use cuid::cuid2;
 use chrono::Utc;
 use bcrypt::{hash, DEFAULT_COST};
 
-use crate::models::{NewUser, User};
+use crate::models::{Credentials, User};
 use crate::system::user_log_creation::user_log_creation;
 
 
-#[post("/users", format = "application/json", data = "<new_user>")]
-pub async fn create_user(pool: &State<PgPool>, new_user: Json<NewUser>) -> Result<Json<User>, rocket::response::status::Custom<String>> {
-    let new_user = new_user.into_inner();
+#[post("/users", format = "application/json", data = "<credentials>")]
+pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<User>, rocket::response::status::Custom<String>> {
+    let new_user = credentials.into_inner();
     let guid = cuid2();
     let date_create = Utc::now();
 

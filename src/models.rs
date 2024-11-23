@@ -15,9 +15,15 @@ pub struct User {
 }
 
 #[derive(Deserialize)]
-pub struct NewUser {
+pub struct Credentials {
     pub username: String,
     pub password: String,
+}
+
+#[derive(Serialize)]
+pub struct LoginResponse {
+    pub message: String,
+    pub token: String,
 }
 
 #[derive(Serialize, FromRow, Deserialize)]

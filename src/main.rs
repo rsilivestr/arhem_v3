@@ -8,7 +8,8 @@ mod models;
 mod system;
 
 mod user;
-use crate::user::create_user::create_user;
+use crate::user::user_create::user_create;
+use crate::user::user_login::user_login;
 
 mod base;
 use crate::base::create_tables::create_tables;
@@ -45,7 +46,7 @@ async fn rocket() -> _ {
         .mount("/", routes![manual::second])
         .mount("/", FileServer::from(relative!("static")))
         .mount("/api",  routes![
-            create_user,
+            user_create, user_login,
             get_events, create_event
         ]).manage(pool)
 }
