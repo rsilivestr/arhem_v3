@@ -10,6 +10,7 @@ use crate::base::create_tables::create_tables;
 
 mod event;
 use crate::event::get_events::get_events;
+use crate::event::create_event::create_event;
 
 mod manual {
     use std::path::{PathBuf, Path};
@@ -38,5 +39,5 @@ async fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![manual::second])
         .mount("/", FileServer::from(relative!("static")))
-        .mount("/api",  routes![get_events]).manage(pool)
+        .mount("/api",  routes![get_events, create_event]).manage(pool)
 }

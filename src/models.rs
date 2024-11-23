@@ -3,7 +3,7 @@ use sqlx::FromRow;
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct Event {
-    guid: String,
-    name: String,
+    pub guid: String,
+    pub name: String,
 }
 
