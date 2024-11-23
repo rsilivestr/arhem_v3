@@ -19,26 +19,35 @@ pub async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
             date_update TIMESTAMP
         );
         CREATE TABLE IF NOT EXISTS events (
-            guid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            guid VARCHAR(25) PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             description TEXT NULL,
             image VARCHAR(255) NULL
             --persona INTEGER NOT NULL,
             --stage INTEGER NOT NULL,
-            --location_id integer INTEGER NULL,
+            --location_id INTEGER NULL,
+            --date_create TIMESTAMP,
+            --date_update TIMESTAMP,
+            --user_guid VARCHAR(25),
         );
         CREATE TABLE IF NOT EXISTS event_steps (
-            guid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            event_guid UUID REFERENCES events(guid),
+            guid VARCHAR(25) PRIMARY KEY,
+            event_guid VARCHAR(25) REFERENCES events(guid),
             start BOOLEAN NOT NULL,
-            finish BOOLEAN NOT NULL, 
+            finish BOOLEAN NOT NULL,
             text TEXT NOT NULL
+            --date_create TIMESTAMP,
+            --date_update TIMESTAMP,
+            --user_guid VARCHAR(25),
         );
         CREATE TABLE IF NOT EXISTS event_steps_links (
-            guid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            guid VARCHAR(25) PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
-            next_step UUID REFERENCES event_steps(guid)
-            ---demaind_id 
+            next_step VARCHAR(25) REFERENCES event_steps(guid)
+            --demaind_id
+            --date_create TIMESTAMP,
+            --date_update TIMESTAMP,
+            --user_guid VARCHAR(25),
         );
         "#,
     )

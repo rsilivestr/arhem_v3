@@ -1,10 +1,10 @@
 use std::env;
 use sqlx::PgPool;
 use dotenv::dotenv;
-
 use rocket::fs::{FileServer, relative};
 use rocket::routes;
 
+mod models;
 mod base;
 use crate::base::create_tables::create_tables;
 
