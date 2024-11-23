@@ -5,6 +5,11 @@ use rocket::fs::{FileServer, relative};
 use rocket::routes;
 
 mod models;
+mod system;
+
+mod user;
+use crate::user::create_user::create_user;
+
 mod base;
 use crate::base::create_tables::create_tables;
 
@@ -39,5 +44,8 @@ async fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![manual::second])
         .mount("/", FileServer::from(relative!("static")))
-        .mount("/api",  routes![get_events, create_event]).manage(pool)
+        .mount("/api",  routes![
+            create_user,
+            get_events, create_event
+        ]).manage(pool)
 }

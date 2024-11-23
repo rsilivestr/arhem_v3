@@ -4,13 +4,24 @@ pub async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
 
     pool.execute(
         r#"
-        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
+            guid VARCHAR(25) PRIMARY KEY,
             username VARCHAR(255) NOT NULL UNIQUE,
             password_hash VARCHAR(255) NOT NULL,
+            admin BOOLEAN NOT NULL,
+            donate BOOLEAN NOT NULL,
             active BOOLEAN NOT NULL,
-            token VARCHAR(255) NULL
+            token VARCHAR(25) NULL,
+            date_create TIMESTAMPTZ
+        );
+        CREATE TABLE IF NOT EXISTS users_log_text(
+            id SERIAL PRIMARY KEY,
+            text TEXT NOT NULL UNIQUE
+        );
+        CREATE TABLE IF NOT EXISTS users_log(
+            time TIMESTAMPTZ,
+            user_guid VARCHAR(25) REFERENCES users(guid),
+            text_id SERIAL REFERENCES users_log_text(id)
         );
         CREATE TABLE IF NOT EXISTS locations (
             id SERIAL PRIMARY KEY,
