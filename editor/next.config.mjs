@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  cleanDistDir: true,
+  distDir:'../static/editor'
   output: 'export',
 };
 
