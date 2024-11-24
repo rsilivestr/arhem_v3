@@ -45,3 +45,27 @@ pub struct Event {
     pub user: String,
 }
 
+#[derive(Serialize, FromRow, Deserialize)]
+pub struct NewEventStep {
+    pub guid: String,
+    pub event_guid: String,
+    pub start: bool,
+    pub finish: bool,
+    pub name: String,
+    pub text: String,
+    pub image: Option<String>,
+}
+
+#[derive(Serialize, FromRow, Deserialize)]
+pub struct EventStep {
+    pub guid: String,
+    pub event_guid: String,
+    pub start: bool,
+    pub finish: bool,
+    pub name: String,
+    pub text: Option<String>,
+    pub image: Option<String>,
+    pub date_create: String,
+    pub date_update: String,
+    pub user: String,
+}
