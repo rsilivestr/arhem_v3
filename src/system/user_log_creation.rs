@@ -22,7 +22,6 @@ pub async fn user_log_creation(pool: &PgPool, user_guid: &str, log_text: &str) -
     match result {
         Ok(_) => Ok(()),
         Err(e) => {
-            eprintln!("Database error: {}", e);
             Err(Custom(Status::InternalServerError, format!("Database error: {}", e)))
         }
     }

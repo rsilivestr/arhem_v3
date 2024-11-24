@@ -1,9 +1,10 @@
-use rocket::{get, serde::json::Json, State};
+use rocket::{get, serde::json::Json, State, response::status::Custom, http::Status};
 use sqlx::PgPool;
 use crate::models::Event;
+use crate::system::admin_token::AdminToken;
 
 #[get("/events")]
-pub async fn get_events(pool: &State<PgPool>) -> Result<Json<Vec<Event>>, rocket::response::status::Custom<String>> {
+pub async fn get_events(pool: &State<PgPool>, _user_guid: AdminToken) -> Result<Json<Vec<Event>>, Custom<String>> {
     let query = r#"SELECT guid, name FROM events;"#;
 
     let events: Vec<Event> = match sqlx::query_as::<_, Event>(query)
@@ -12,12 +13,7 @@ pub async fn get_events(pool: &State<PgPool>) -> Result<Json<Vec<Event>>, rocket
     {
         Ok(events) => events,
         Err(e) => {
-            // Log the error for better debugging
-            eprintln!("Database error: {}", e);
-            return Err(rocket::response::status::Custom(
-                rocket::http::Status::InternalServerError,
-                format!("Database error: {}", e),
-            ));
+            return Err(Custom(Status::InternalServerError, format!("Database error: {}", e),));
         }
     };
 

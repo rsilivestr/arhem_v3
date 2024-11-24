@@ -1,4 +1,4 @@
-use rocket::{post, serde::json::Json, State};
+use rocket::{post, serde::json::Json, State, response::status::Custom, http::Status};
 use sqlx::{query_as, PgPool};
 use cuid::cuid2;
 use chrono::Utc;
@@ -9,7 +9,7 @@ use crate::system::user_log_creation::user_log_creation;
 
 
 #[post("/users", format = "application/json", data = "<credentials>")]
-pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<User>, rocket::response::status::Custom<String>> {
+pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<User>, Custom<String>> {
     let new_user = credentials.into_inner();
     let guid = cuid2();
     let date_create = Utc::now();
@@ -53,10 +53,7 @@ pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -
         Err(e) => {
             // Log the error for better debugging
             eprintln!("Database error: {}", e);
-            return Err(rocket::response::status::Custom(
-                rocket::http::Status::InternalServerError,
-                format!("Database error: {}", e),
-            ));
+            return Err(Custom(Status::InternalServerError, format!("Database error: {}", e),));
         }
     };
     user_log_creation(pool.inner(), &inserted_user.guid, "Пользователь создан").await?;

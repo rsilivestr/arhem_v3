@@ -1,4 +1,4 @@
-use rocket::{post, serde::json::Json, State};
+use rocket::{post, serde::json::Json, State, response::Debug};
 use sqlx::{query_scalar, PgPool};
 use bcrypt::verify;
 use cuid::cuid2;
@@ -7,7 +7,7 @@ use crate::models::{Credentials, LoginResponse};
 
 
 #[post("/user_login", format = "json", data = "<credentials>")]
-pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<LoginResponse>, rocket::response::Debug<sqlx::Error>> {
+pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<LoginResponse>, Debug<sqlx::Error>> {
     let credentials = credentials.into_inner();
 
     // Ищем пользователя по username
@@ -15,10 +15,10 @@ pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) ->
         .bind(&credentials.username)
         .fetch_one(pool.inner())
         .await
-        .map_err(rocket::response::Debug)?;
+        .map_err(Debug)?;
 
     if !exists {
-        return Err(rocket::response::Debug(sqlx::Error::RowNotFound));
+        return Err(Debug(sqlx::Error::RowNotFound));
     }
 
     // Получаем хеш пароля из базы данных
@@ -26,7 +26,7 @@ pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) ->
         .bind(&credentials.username)
         .fetch_one(pool.inner())
         .await
-        .map_err(rocket::response::Debug)?;
+        .map_err(Debug)?;
 
     if let Ok(valid) = verify(credentials.password.as_bytes(), &user_hash) {
         if valid {
@@ -48,9 +48,9 @@ pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) ->
                 token,
             }))
         } else {
-            Err(rocket::response::Debug(sqlx::Error::RowNotFound))
+            Err(Debug(sqlx::Error::RowNotFound))
         }
     } else {
-        Err(rocket::response::Debug(sqlx::Error::RowNotFound))
+        Err(Debug(sqlx::Error::RowNotFound))
     }
 }
