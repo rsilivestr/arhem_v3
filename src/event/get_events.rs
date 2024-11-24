@@ -5,7 +5,15 @@ use crate::system::admin_token::AdminToken;
 
 #[get("/events")]
 pub async fn get_events(pool: &State<PgPool>, _user_guid: AdminToken) -> Result<Json<Vec<Event>>, Custom<String>> {
-    let query = r#"SELECT guid, name FROM events;"#;
+    let query = r#"
+        SELECT 
+           e.guid, e.name, e.description, e.image,
+           to_char(e.date_create AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_create,
+           to_char(e.date_update AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_update,
+           u.username as user
+        FROM events e
+        inner join users u on e.user_guid = u.guid;
+        "#;
 
     let events: Vec<Event> = match sqlx::query_as::<_, Event>(query)
         .fetch_all(pool.inner())

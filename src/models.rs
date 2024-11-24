@@ -27,8 +27,21 @@ pub struct LoginResponse {
 }
 
 #[derive(Serialize, FromRow, Deserialize)]
+pub struct NewEvent {
+    pub guid: String,
+    pub name: String,
+    pub description: Option<String>,
+    pub image: Option<String>,
+}
+
+#[derive(Serialize, FromRow, Deserialize)]
 pub struct Event {
     pub guid: String,
     pub name: String,
+    pub description: Option<String>,
+    pub image: Option<String>,
+    pub date_create: String,
+    pub date_update: String,
+    pub user: String,
 }
 

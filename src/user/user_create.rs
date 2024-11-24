@@ -7,7 +7,6 @@ use bcrypt::{hash, DEFAULT_COST};
 use crate::models::{Credentials, User};
 use crate::system::user_log_creation::user_log_creation;
 
-
 #[post("/users", format = "application/json", data = "<credentials>")]
 pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<User>, Custom<String>> {
     let new_user = credentials.into_inner();
@@ -16,11 +15,7 @@ pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -
 
     // Hash the password
     let password_hash = hash(&new_user.password, DEFAULT_COST).map_err(|e| {
-        eprintln!("Password hashing error: {}", e);
-        rocket::response::status::Custom(
-            rocket::http::Status::InternalServerError,
-            format!("Password hashing error: {}", e),
-        )
+        Custom(Status::InternalServerError, format!("Password hashing error: {}", e),)
     })?;
 
     let query = r#"

@@ -41,7 +41,7 @@ async fn rocket() -> _ {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL не задан в конфиге");
     let pool = PgPool::connect(&database_url).await.expect("No DB CONNECT!");
 
-    let _ = create_tables(&pool).await.expect("Не удалось создать таблицы");
+    create_tables(&pool).await.expect("Не удалось создать таблицы");
 
     rocket::build()
         .mount("/", routes![manual::second])
