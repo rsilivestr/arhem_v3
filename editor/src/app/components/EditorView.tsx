@@ -1,6 +1,7 @@
 'use client';
 
 import { Stage } from '@pixi/react';
+
 import { useElementSize } from '../hooks/useResizeObserver';
 import { EventStepView } from './EventStepView';
 
