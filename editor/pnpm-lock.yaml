@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  next:
+    hash: ps5iemv5dw6rvztf4yan4a3nmm
+    path: patches/next.patch
+
 importers:
 
   .:
@@ -22,7 +27,7 @@ importers:
         version: 1.7.2
       next:
         specifier: ^14
-        version: 14.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.18(patch_hash=ps5iemv5dw6rvztf4yan4a3nmm)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       pixijs:
         specifier: ^7
         version: 7.1.4(encoding@0.1.13)
@@ -3902,7 +3907,7 @@ snapshots:
 
   negotiator@0.6.4: {}
 
-  next@14.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@14.2.18(patch_hash=ps5iemv5dw6rvztf4yan4a3nmm)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.2.18
       '@swc/helpers': 0.5.5
