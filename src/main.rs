@@ -3,6 +3,10 @@ use sqlx::PgPool;
 use dotenv::dotenv;
 use rocket::fs::{FileServer, relative};
 use rocket::routes;
+use rocket_cors::{
+    AllowedOrigins,
+    CorsOptions,
+};
 
 mod models;
 mod system;
@@ -45,11 +49,38 @@ async fn rocket() -> _ {
 
     create_tables(&pool).await.expect("Не удалось создать таблицы");
 
+    let cors = CorsOptions {
+        allowed_origins: AllowedOrigins::all(),
+        allowed_methods: vec![
+            rocket::http::Method::Get,
+            rocket::http::Method::Post,
+            rocket::http::Method::Put,
+            rocket::http::Method::Delete,
+            rocket::http::Method::Options,
+        ]
+        .into_iter()
+        .map(From::from)
+        .collect(),
+        allowed_headers: rocket_cors::AllowedHeaders::some(&[
+            "Authorization",
+            "Accept",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Headers",
+            "Content-Type",
+        ]),
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors()
+    .expect("Error creating CORS fairing");
+
     rocket::build()
         .mount("/", routes![manual::second])
         .mount("/", FileServer::from(relative!("static")))
         .mount("/api",  routes![
             user_create, user_login, check_token,
             get_events, create_event, get_event_steps, create_event_step,
-        ]).manage(pool)
+        ])
+        .manage(pool)
+        .attach(cors)
 }
