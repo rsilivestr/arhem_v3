@@ -1,5 +1,5 @@
 use rocket::{post, serde::json::Json, State, response::Debug};
-use sqlx::{query_scalar, PgPool};
+use sqlx::{query_scalar, query, PgPool};
 use bcrypt::verify;
 use cuid::cuid2;
 
@@ -34,14 +34,12 @@ pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) ->
             let token = cuid2();
 
             // Обновляем строку в базе данных с новым токеном
-            sqlx::query!(
-                r#"UPDATE users SET token = $1 WHERE username = $2"#,
-                token,
-                credentials.username
-            )
+            query(r#"UPDATE users SET token = $1 WHERE username = $2"#)
+            .bind(&token)
+            .bind(credentials.username)
             .execute(pool.inner())
             .await
-            .map_err(rocket::response::Debug)?;
+            .map_err(Debug)?;
             // Возвращаем токен в ответе JSON
             Ok(Json(LoginResponse {
                 message: "Logged in successfully".to_string(),
