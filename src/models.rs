@@ -63,7 +63,7 @@ pub struct EventStep {
     pub start: bool,
     pub finish: bool,
     pub name: String,
-    pub text: Option<String>,
+    pub text: String,
     pub image: Option<String>,
     pub date_create: String,
     pub date_update: String,

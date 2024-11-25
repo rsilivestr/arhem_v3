@@ -19,6 +19,7 @@ mod event;
 use crate::event::get_events::get_events;
 use crate::event::create_event::create_event;
 use crate::event::get_event_steps::get_event_steps;
+use crate::event::create_event_step::create_event_step;
 
 mod manual {
     use std::path::{PathBuf, Path};
@@ -49,6 +50,6 @@ async fn rocket() -> _ {
         .mount("/", FileServer::from(relative!("static")))
         .mount("/api",  routes![
             user_create, user_login, check_token,
-            get_events, create_event, get_event_steps
+            get_events, create_event, get_event_steps, create_event_step,
         ]).manage(pool)
 }
