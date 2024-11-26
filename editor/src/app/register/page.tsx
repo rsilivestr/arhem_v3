@@ -38,7 +38,7 @@ export default function Login() {
     onSuccess: ({ token }, { username }) => {
       setToken(token);
       setUsername(username);
-      router.push('/');
+      router.push('/login');
     },
   });
 
