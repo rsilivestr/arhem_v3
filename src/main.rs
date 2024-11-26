@@ -33,14 +33,22 @@ mod manual {
     #[rocket::get("/second/<path..>")]
     pub async fn second(path: PathBuf) -> Option<NamedFile> {
         let mut path = Path::new(super::relative!("static")).join(path);
+
+        // Check if the path is a directory
         if path.is_dir() {
-            path.push("login.html");
+            path.push("index.html");
+        } else {
+            // If the path is not a directory, check if it exists with the .html extension
+            let mut html_path = path.clone();
+            html_path.set_extension("html");
+            if html_path.exists() {
+                path = html_path;
+            }
         }
 
         NamedFile::open(path).await.ok()
     }
 }
-
 
 #[rocket::launch]
 async fn rocket() -> _ {
