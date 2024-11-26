@@ -1,5 +1,5 @@
 use rocket::{post, serde::json::Json, State, response::status::Custom, http::Status};
-use sqlx::{query_as, PgPool};
+use sqlx::{query_as, query_scalar, PgPool};
 use cuid::cuid2;
 use chrono::Utc;
 use bcrypt::{hash, DEFAULT_COST};
@@ -13,22 +13,27 @@ pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -
     let guid = cuid2();
     let date_create = Utc::now();
 
+    // Check if the username already exists
+    let exists: bool = query_scalar(r#"SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)"#)
+        .bind(&new_user.username)
+        .fetch_one(pool.inner())
+        .await
+        .map_err(|e| {
+            Custom(Status::InternalServerError, format!("Database error: {}", e))
+        })?;
+
+    if exists {
+        return Err(Custom(Status::Conflict, "Пользователь с таким именем уже существет".to_string()));
+    }
+
     // Hash the password
     let password_hash = hash(&new_user.password, DEFAULT_COST).map_err(|e| {
-        Custom(Status::InternalServerError, format!("Password hashing error: {}", e),)
+        Custom(Status::InternalServerError, format!("Password hashing error: {}", e))
     })?;
 
     let query = r#"
         INSERT INTO users (guid, username, password_hash, admin, donate, active, token, date_create)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        ON CONFLICT (username)
-        DO UPDATE SET
-            password_hash = EXCLUDED.password_hash,
-            admin = EXCLUDED.admin,
-            donate = EXCLUDED.donate,
-            active = EXCLUDED.active,
-            token = EXCLUDED.token,
-            date_create = EXCLUDED.date_create
         RETURNING guid, username, password_hash, admin, donate, active, token, date_create;
     "#;
 
@@ -48,11 +53,11 @@ pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -
         Err(e) => {
             // Log the error for better debugging
             eprintln!("Database error: {}", e);
-            return Err(Custom(Status::InternalServerError, format!("Database error: {}", e),));
+            return Err(Custom(Status::InternalServerError, format!("Database error: {}", e)));
         }
     };
+
     user_log_creation(pool.inner(), &inserted_user.guid, "Пользователь создан").await?;
 
     Ok(Json(inserted_user))
 }
-
