@@ -1,0 +1,94 @@
+'use client';
+
+import { useMutation } from '@tanstack/react-query';
+import ky from 'ky';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+
+import { API_BASE_URL } from '@/config';
+import { setToken, setUsername } from '@/utils/storage';
+
+import { TextField } from '../components/TextField';
+
+type UserCredentials = {
+  username: string;
+  password: string;
+  passwordRepeat: string;
+};
+
+type UserRegisterResponse = {
+  token: string;
+  message: string;
+};
+
+export default function Login() {
+  const router = useRouter();
+
+  const { isError, mutate: registerUser } = useMutation({
+    mutationFn: async (json: UserCredentials) => {
+      return await ky
+        .post(`${API_BASE_URL}/users`, { json })
+        .json<UserRegisterResponse>();
+    },
+    onSuccess: ({ token }, { username }) => {
+      setToken(token);
+      setUsername(username);
+      router.push('/');
+    },
+  });
+
+  const {
+    formState: { errors },
+    getValues,
+    register,
+    handleSubmit,
+  } = useForm<UserCredentials>();
+
+  return (
+    <div className="h-full py-64 flex justify-center">
+      <form
+        className="w-[300px] flex flex-col gap-4"
+        onSubmit={handleSubmit((cred) => registerUser(cred))}
+      >
+        <TextField
+          label="Логин"
+          type="text"
+          autoComplete="username"
+          error={errors.username?.message}
+          {...register('username', {
+            required: { value: true, message: 'Поле обязательно' },
+          })}
+        />
+        <TextField
+          label="Пароль"
+          type="password"
+          autoComplete="new-password"
+          error={errors.password?.message}
+          {...register('password', {
+            required: { value: true, message: 'Поле обязательно' },
+          })}
+        />
+        <TextField
+          label="Подтверждение пароля"
+          type="password"
+          autoComplete="new-password"
+          error={errors.passwordRepeat?.message}
+          {...register('passwordRepeat', {
+            required: { value: true, message: 'Поле обязательно' },
+            validate: (value: string) =>
+              value === getValues('password') || 'Пароли не совпадают',
+          })}
+        />
+        <button
+          className="px-2 py-1 text-white bg-pink-800 hover:bg-pink-900"
+          type="submit"
+        >
+          Создать пользователя
+        </button>
+        {isError && (
+          <p className="text-red-600 dark:text-red-400">Что-то пошло не так</p>
+        )}
+      </form>
+    </div>
+  );
+}
