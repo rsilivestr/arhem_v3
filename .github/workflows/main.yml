@@ -44,13 +44,15 @@ jobs:
         run: corepack enable pnpm
       - name: Install dependencies
         run: cd editor && pnpm install
+      - name: Create necessary directories
+        run: mkdir -p static/editor
       - name: Build app
         run: cd editor && pnpm build
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-bundle
-          path: editor/.next/static
+          path: static/editor
 
   deploy:
     runs-on: ubuntu-latest
