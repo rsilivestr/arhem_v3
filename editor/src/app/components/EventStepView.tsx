@@ -18,11 +18,7 @@ const width = 200;
 const height = 75;
 const answerHeight = 25;
 
-export function EventStepView({
-  text,
-  answers,
-  position: [x, y],
-}: Props) {
+export function EventStepView({ text, answers, position: [x, y] }: Props) {
   return (
     <Container x={x} y={y}>
       <Graphics

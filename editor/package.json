@@ -10,24 +10,38 @@
     "dev": "next dev",
     "build": "next build && cp -r out/* ../static/editor/",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier ./src --write",
+    "prepare": "cd .. && husky ./editor/.husky"
   },
   "dependencies": {
-    "@pixi/events": "7",
-    "@pixi/react": "7",
-    "next": "14.2.18",
-    "pixijs": "7",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "@pixi/events": "^7",
+    "@pixi/react": "^7",
+    "@tanstack/react-query": "^5",
+    "ky": "^1",
+    "next": "^14",
+    "pixijs": "^7",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@trivago/prettier-plugin-sort-imports": "^4",
+    "@types/node": "^18",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "15.0.3",
+    "eslint-config-next": "^14",
+    "husky": "^9",
+    "lint-staged": "^15",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "prettier": "^3",
+    "tailwindcss": "^3",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "next": "patches/next.patch"
+    }
   }
 }
