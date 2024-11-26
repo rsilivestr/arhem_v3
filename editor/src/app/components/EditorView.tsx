@@ -9,7 +9,7 @@ export function EditorView() {
   const { ref, width, height } = useElementSize();
 
   return (
-    <div className="h-full" ref={ref}>
+    <div className="grow" ref={ref}>
       <Stage
         width={width}
         height={height}
