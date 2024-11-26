@@ -14,7 +14,7 @@ const firaCode = localFont({
 
 export const metadata: Metadata = {
   title: 'Arhm Editr',
-  icons: ['favicon.svg'],
+  icons: ['/editor/favicon.svg'],
 };
 
 export default function RootLayout({
