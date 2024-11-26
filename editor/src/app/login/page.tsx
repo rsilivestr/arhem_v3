@@ -3,10 +3,12 @@
 import { useMutation } from '@tanstack/react-query';
 import ky from 'ky';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, ValidationRule } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
 import { setToken, setUsername } from '@/utils/storage';
+
+import { TextField } from '../components/TextField';
 
 type UserCredentials = {
   username: string;
@@ -16,6 +18,11 @@ type UserCredentials = {
 type UserLoginResponse = {
   token: string;
   message: string;
+};
+
+const required: ValidationRule<boolean> = {
+  value: true,
+  message: 'Поле обязательно',
 };
 
 export default function Login() {
@@ -34,7 +41,11 @@ export default function Login() {
     },
   });
 
-  const { register, handleSubmit } = useForm<UserCredentials>();
+  const {
+    formState: { errors },
+    register,
+    handleSubmit,
+  } = useForm<UserCredentials>();
 
   return (
     <div className="h-full py-64 flex justify-center">
@@ -42,24 +53,20 @@ export default function Login() {
         className="w-[300px] flex flex-col gap-4"
         onSubmit={handleSubmit((cred) => login(cred))}
       >
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-bold">Логин</span>
-          <input
-            className="px-2 py-1 dark:bg-slate-700"
-            type="text"
-            autoComplete="username"
-            {...register('username', { required: true })}
-          />
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-bold">Пароль</span>
-          <input
-            className="px-2 py-1 dark:bg-slate-700"
-            type="password"
-            autoComplete="current-password"
-            {...register('password', { required: true })}
-          />
-        </label>
+        <TextField
+          label="Логин"
+          type="text"
+          autoComplete="username"
+          error={errors.username?.message}
+          {...register('username', { required })}
+        />
+        <TextField
+          label="Пароль"
+          type="password"
+          autoComplete="current-password"
+          error={errors.password?.message}
+          {...register('password', { required })}
+        />
         <button
           className="px-2 py-1 text-white bg-pink-800 hover:bg-pink-900"
           type="submit"

@@ -3,7 +3,7 @@
 import { useMutation } from '@tanstack/react-query';
 import ky from 'ky';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, ValidationRule } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
 import { setToken, setUsername } from '@/utils/storage';
@@ -19,6 +19,11 @@ type UserCredentials = {
 type UserRegisterResponse = {
   token: string;
   message: string;
+};
+
+const required: ValidationRule<boolean> = {
+  value: true,
+  message: 'Поле обязательно',
 };
 
 export default function Login() {
@@ -55,18 +60,14 @@ export default function Login() {
           type="text"
           autoComplete="username"
           error={errors.username?.message}
-          {...register('username', {
-            required: { value: true, message: 'Поле обязательно' },
-          })}
+          {...register('username', { required })}
         />
         <TextField
           label="Пароль"
           type="password"
           autoComplete="new-password"
           error={errors.password?.message}
-          {...register('password', {
-            required: { value: true, message: 'Поле обязательно' },
-          })}
+          {...register('password', { required })}
         />
         <TextField
           label="Подтверждение пароля"
@@ -74,7 +75,7 @@ export default function Login() {
           autoComplete="new-password"
           error={errors.passwordRepeat?.message}
           {...register('passwordRepeat', {
-            required: { value: true, message: 'Поле обязательно' },
+            required,
             validate: (value: string) =>
               value === getValues('password') || 'Пароли не совпадают',
           })}
