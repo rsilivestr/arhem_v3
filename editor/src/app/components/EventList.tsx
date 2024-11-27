@@ -82,7 +82,10 @@ export function EventList() {
             key={evt.guid}
             className="border-b border-slate-200 dark:border-slate-700"
           >
-            <Link href={`?${evt.guid}`} className="px-4 py-2 flex flex-col">
+            <Link
+              href={{ query: { event: evt.guid } }}
+              className="px-4 py-2 flex flex-col"
+            >
               <span>{evt.name}</span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {evt.code_name}
