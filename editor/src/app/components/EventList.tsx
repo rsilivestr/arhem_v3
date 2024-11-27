@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { API_BASE_URL } from '@/config';
-import { getToken } from '@/utils/storage';
+import { useSession } from '@/store/session';
 
 import { SearchIcon } from './icons/SearchIcon';
 
@@ -22,7 +22,7 @@ type EventsRespose = Array<{
 }>;
 
 export function EventList() {
-  const token = getToken();
+  const { token } = useSession();
 
   const { data: events } = useQuery({
     queryKey: ['events'],
