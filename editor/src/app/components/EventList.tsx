@@ -87,7 +87,10 @@ export function EventList() {
             className="border-b border-slate-200 dark:border-slate-700"
           >
             <Link
-              href={{ query: { event: evt.guid } }}
+              href={{
+                query: { event: evt.guid },
+                slashes: true,
+              }}
               className="px-4 py-2 flex flex-col hover:bg-slate-200 dark:hover:bg-slate-800"
             >
               <span className="overflow-hidden text-ellipsis whitespace-nowrap">
