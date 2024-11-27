@@ -66,9 +66,7 @@ export function EventList() {
   return (
     <aside className="min-w-[400px]">
       <div className="relative">
-        <span className="h-full aspect-square absolute flex items-center justify-center">
-          <SearchIcon width={24} height={24} />
-        </span>
+        <SearchIcon className="absolute h-full w-auto p-2" />
         <input
           type="search"
           className="w-full pl-10 pr-4 py-2 dark:bg-slate-700"
@@ -84,10 +82,12 @@ export function EventList() {
           >
             <Link
               href={{ query: { event: evt.guid } }}
-              className="px-4 py-2 flex flex-col"
+              className="px-4 py-2 flex flex-col hover:bg-slate-200 dark:hover:bg-slate-800"
             >
-              <span>{evt.name}</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+                {evt.name}
+              </span>
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                 {evt.code_name}
               </span>
             </Link>
