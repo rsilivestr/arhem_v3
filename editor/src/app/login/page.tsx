@@ -31,7 +31,7 @@ export default function Login() {
   const { isError, mutate: login } = useMutation({
     mutationFn: async (json: UserCredentials) => {
       return await ky
-        .post(`${API_BASE_URL}/user_login`, { json })
+        .post(`${API_BASE_URL}/admin_login`, { json })
         .json<UserLoginResponse>();
     },
     onSuccess: ({ token }, { username }) => {
