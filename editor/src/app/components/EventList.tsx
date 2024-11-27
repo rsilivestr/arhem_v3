@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import ky from 'ky';
+import ky, { HTTPError } from 'ky';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -37,6 +37,12 @@ export function EventList() {
         .json();
     },
     enabled: !!token,
+    retry(failureCount, error) {
+      return (
+        failureCount < 6 &&
+        !(error instanceof HTTPError && error.response.status === 401)
+      );
+    },
   });
 
   const [filterTerm, setFilterTerm] = useState('');
