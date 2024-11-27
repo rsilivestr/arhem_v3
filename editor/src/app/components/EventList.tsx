@@ -1,12 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import ky from 'ky';
+import ky, { HTTPError } from 'ky';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { API_BASE_URL } from '@/config';
-import { getToken } from '@/utils/storage';
+import { useSession } from '@/store/session';
 
 import { SearchIcon } from './icons/SearchIcon';
 
@@ -22,7 +22,7 @@ type EventsRespose = Array<{
 }>;
 
 export function EventList() {
-  const token = getToken();
+  const { token } = useSession();
 
   const { data: events } = useQuery({
     queryKey: ['events'],
@@ -37,6 +37,12 @@ export function EventList() {
         .json();
     },
     enabled: !!token,
+    retry(failureCount, error) {
+      return (
+        failureCount < 6 &&
+        !(error instanceof HTTPError && error.response.status === 401)
+      );
+    },
   });
 
   const [filterTerm, setFilterTerm] = useState('');
@@ -49,7 +55,7 @@ export function EventList() {
     const tid = setTimeout(() => {
       const term = filterTerm.trim().toLocaleLowerCase();
       setFilteredEvents(
-        term.length >= 2
+        term.length > 0
           ? events.filter(
               ({ name, code_name }) =>
                 name.toLocaleLowerCase().includes(term) ||
@@ -57,7 +63,7 @@ export function EventList() {
             )
           : events
       );
-    }, 500);
+    }, 300);
     return () => {
       clearTimeout(tid);
     };
@@ -66,9 +72,7 @@ export function EventList() {
   return (
     <aside className="min-w-[400px]">
       <div className="relative">
-        <span className="h-full aspect-square absolute flex items-center justify-center">
-          <SearchIcon width={24} height={24} />
-        </span>
+        <SearchIcon className="absolute h-full w-auto p-2" />
         <input
           type="search"
           className="w-full pl-10 pr-4 py-2 dark:bg-slate-700"
@@ -84,10 +88,12 @@ export function EventList() {
           >
             <Link
               href={{ query: { event: evt.guid } }}
-              className="px-4 py-2 flex flex-col"
+              className="px-4 py-2 flex flex-col hover:bg-slate-200 dark:hover:bg-slate-800"
             >
-              <span>{evt.name}</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+                {evt.name}
+              </span>
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                 {evt.code_name}
               </span>
             </Link>
