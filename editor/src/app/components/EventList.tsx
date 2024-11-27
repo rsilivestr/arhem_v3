@@ -49,7 +49,7 @@ export function EventList() {
     const tid = setTimeout(() => {
       const term = filterTerm.trim().toLocaleLowerCase();
       setFilteredEvents(
-        term.length >= 2
+        term.length > 0
           ? events.filter(
               ({ name, code_name }) =>
                 name.toLocaleLowerCase().includes(term) ||
@@ -57,7 +57,7 @@ export function EventList() {
             )
           : events
       );
-    }, 500);
+    }, 300);
     return () => {
       clearTimeout(tid);
     };
