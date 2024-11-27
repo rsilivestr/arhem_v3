@@ -5,13 +5,13 @@ use chrono::{DateTime, Utc};
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct User {
     pub guid: String,
-    username: String,
-    password_hash: String,
-    admin: bool,
-    donate: bool,
-    active: bool,
-    token: Option<String>,
-    date_create: DateTime<Utc>,
+    pub username: String,
+    pub password_hash: String,
+    pub admin: bool,
+    pub donate: bool,
+    pub active: bool,
+    pub token: Option<String>,
+    pub date_create: DateTime<Utc>,
 }
 
 #[derive(Deserialize)]

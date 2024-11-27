@@ -1,54 +1,47 @@
-use rocket::{post, serde::json::Json, State, response::Debug};
-use sqlx::{query_scalar, query, PgPool};
+use rocket::{post, serde::json::Json, State, response::status::Forbidden};
+use sqlx::{query, query_as, PgPool};
 use bcrypt::verify;
 use cuid::cuid2;
 
-use crate::models::{Credentials, LoginResponse};
-
+use crate::models::{Credentials, LoginResponse, User};
 
 #[post("/user_login", format = "json", data = "<credentials>")]
-pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<LoginResponse>, Debug<sqlx::Error>> {
+pub async fn user_login(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<LoginResponse>, Forbidden<String>> {
     let credentials = credentials.into_inner();
 
-    // Ищем пользователя по username
-    let exists: bool = query_scalar(r#"SELECT EXISTS(SELECT 1 FROM users WHERE username = $1 and active = true)"#)
-        .bind(&credentials.username)
-        .fetch_one(pool.inner())
-        .await
-        .map_err(Debug)?;
-
-    if !exists {
-        return Err(Debug(sqlx::Error::RowNotFound));
-    }
-
     // Получаем хеш пароля из базы данных
-    let user_hash: String = query_scalar(r#"SELECT password_hash FROM users WHERE username = $1"#)
+    let user: Option<User> = query_as::<_, User>(r#"SELECT * FROM users WHERE username = $1 limit 1;"#)
         .bind(&credentials.username)
-        .fetch_one(pool.inner())
+        .fetch_optional(pool.inner())
         .await
-        .map_err(Debug)?;
+        .map_err(|_| Forbidden("Не смог найти user".to_string()))?;
 
-    if let Ok(valid) = verify(credentials.password.as_bytes(), &user_hash) {
+    let user = match user {
+        Some(h) => h,
+        None => return Err(Forbidden("Не найден user".to_string())),
+    };
+
+    if let Ok(valid) = verify(credentials.password.as_bytes(), &user.password_hash) {
         if valid {
-            // Генерируем UUID для токена
+            // Генерируем новый UUID для токена
             let token = cuid2();
 
             // Обновляем строку в базе данных с новым токеном
             query(r#"UPDATE users SET token = $1 WHERE username = $2"#)
-            .bind(&token)
-            .bind(credentials.username)
-            .execute(pool.inner())
-            .await
-            .map_err(Debug)?;
-            // Возвращаем токен в ответе JSON
+                .bind(&token)
+                .bind(&credentials.username)
+                .execute(pool.inner())
+                .await
+                .map_err(|_| Forbidden("Не смог update token".to_string()))?;
+
             Ok(Json(LoginResponse {
                 message: "Logged in successfully".to_string(),
                 token,
             }))
         } else {
-            Err(Debug(sqlx::Error::RowNotFound))
+           Err(Forbidden("Неправильный пароль".to_string()))
         }
     } else {
-        Err(Debug(sqlx::Error::RowNotFound))
+        Err(Forbidden("Неправильный пароль".to_string()))
     }
 }

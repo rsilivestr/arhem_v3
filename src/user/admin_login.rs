@@ -1,44 +1,31 @@
-use rocket::{post, serde::json::Json, State, response::Debug};
-use sqlx::{query_scalar, query, PgPool};
+use rocket::{post, serde::json::Json, State, response::status::Forbidden};
+use sqlx::{query, query_as, PgPool};
 use bcrypt::verify;
 use cuid::cuid2;
 
-use crate::models::{Credentials, LoginResponse};
-
+use crate::models::{Credentials, LoginResponse, User};
 
 #[post("/admin_login", format = "json", data = "<credentials>")]
-pub async fn admin_login(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<LoginResponse>, Debug<sqlx::Error>> {
+pub async fn admin_login(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<LoginResponse>, Forbidden<String>> {
     let credentials = credentials.into_inner();
 
-    // Ищем пользователя по username
-    let exists: bool = query_scalar(r#"SELECT EXISTS(SELECT 1 FROM users WHERE username = $1 and active = true and admin = true)"#)
-        .bind(&credentials.username)
-        .fetch_one(pool.inner())
-        .await
-        .map_err(Debug)?;
-
-    if !exists {
-        return Err(Debug(sqlx::Error::RowNotFound));
-    }
-
     // Получаем хеш пароля из базы данных
-    let user_hash: String = query_scalar(r#"SELECT password_hash FROM users WHERE username = $1"#)
+    let user: Option<User> = query_as::<_, User>(r#"SELECT * FROM users WHERE username = $1 and admin = true limit 1;"#)
         .bind(&credentials.username)
-        .fetch_one(pool.inner())
+        .fetch_optional(pool.inner())
         .await
-        .map_err(Debug)?;
+        .map_err(|_| Forbidden("Не смог найти user".to_string()))?;
 
-    if let Ok(valid) = verify(credentials.password.as_bytes(), &user_hash) {
+    let user = match user {
+        Some(h) => h,
+        None => return Err(Forbidden("Не найден admin".to_string())),
+    };
+
+    if let Ok(valid) = verify(credentials.password.as_bytes(), &user.password_hash) {
         if valid {
             // Проверяем, есть ли уже токен
-            let token: Option<String> = query_scalar(r#"SELECT token FROM users WHERE username = $1"#)
-                .bind(&credentials.username)
-                .fetch_optional(pool.inner())
-                .await
-                .map_err(Debug)?;
-
-            let token = match token {
-                Some(t) => t,
+            let token = match user.token {
+                Some(token) => token,
                 None => {
                     // Генерируем новый UUID для токена
                     let new_token = cuid2();
@@ -49,20 +36,19 @@ pub async fn admin_login(pool: &State<PgPool>, credentials: Json<Credentials>) -
                         .bind(&credentials.username)
                         .execute(pool.inner())
                         .await
-                        .map_err(Debug)?;
+                        .map_err(|_| Forbidden("Не смог update token".to_string()))?;
 
                     new_token
                 }
             };
-            // Возвращаем токен в ответе JSON
             Ok(Json(LoginResponse {
                 message: "Logged in successfully".to_string(),
                 token,
             }))
         } else {
-            Err(Debug(sqlx::Error::RowNotFound))
+           Err(Forbidden("Неправильный пароль".to_string()))
         }
     } else {
-        Err(Debug(sqlx::Error::RowNotFound))
+        Err(Forbidden("Неправильный пароль".to_string()))
     }
 }
