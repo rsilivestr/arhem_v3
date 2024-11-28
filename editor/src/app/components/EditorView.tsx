@@ -2,7 +2,8 @@
 
 import { Stage } from '@pixi/react';
 
-import { useElementSize } from '../hooks/useResizeObserver';
+import { useElementSize } from '@/hooks/useResizeObserver';
+
 import { EditorGrid } from './EditorGrid';
 
 export function EditorView() {
