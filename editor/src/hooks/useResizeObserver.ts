@@ -53,7 +53,7 @@ export function useResizeObserver<T extends HTMLElement = HTMLDivElement>(
         cancelAnimationFrame(frameID.current);
       }
     };
-  }, [observer, options, ref.current]);
+  }, [observer, options]);
 
   return [ref, rect] as const;
 }
