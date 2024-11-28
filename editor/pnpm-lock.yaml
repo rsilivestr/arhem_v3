@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  '@pixi/events':
+    hash: rq4grd4dcwnqx2xn242xaf27my
+    path: patches/@pixi__events.patch
   next:
     hash: ps5iemv5dw6rvztf4yan4a3nmm
     path: patches/next.patch
@@ -15,7 +18,7 @@ importers:
     dependencies:
       '@pixi/events':
         specifier: ^7
-        version: 7.4.2(@pixi/core@7.4.2)(@pixi/display@7.4.2(@pixi/core@7.4.2))
+        version: 7.4.2(patch_hash=rq4grd4dcwnqx2xn242xaf27my)(@pixi/core@7.4.2)(@pixi/display@7.4.2(@pixi/core@7.4.2))
       '@pixi/react':
         specifier: ^7
         version: 7.1.2(rbk2pa5kjfujbi7gk4qxenqa5a)

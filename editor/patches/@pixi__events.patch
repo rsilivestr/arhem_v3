@@ -1,0 +1,26 @@
+diff --git a/lib/EventBoundary.js b/lib/EventBoundary.js
+index 30edf1ead42789d4e77c449d01fbd3ef9bc2d67f..679dc6102567c2ba83e6e1254f729b9b49bb0028 100644
+--- a/lib/EventBoundary.js
++++ b/lib/EventBoundary.js
+@@ -34,7 +34,7 @@ class EventBoundary {
+    * @param type
+    */
+   dispatchEvent(e, type) {
+-    e.propagationStopped = !1, e.propagationImmediatelyStopped = !1, this.propagate(e, type), this.dispatch.emit(type || e.type, e);
++    e.propagationStopped = !1, e.propagationImmediatelyStopped = !1, e.defaultPrevented = !1, this.propagate(e, type), this.dispatch.emit(type || e.type, e);
+   }
+   /**
+    * Maps the given upstream event through the event boundary and propagates it downstream.
+diff --git a/lib/EventBoundary.mjs b/lib/EventBoundary.mjs
+index d1da58c57c42b2e448e0f6e3dadf182515cb7182..7bde61f5ea39dc3decfb8d5d5907f87f391967e3 100644
+--- a/lib/EventBoundary.mjs
++++ b/lib/EventBoundary.mjs
+@@ -37,7 +37,7 @@ class EventBoundary {
+    * @param type
+    */
+   dispatchEvent(e, type) {
+-    e.propagationStopped = !1, e.propagationImmediatelyStopped = !1, this.propagate(e, type), this.dispatch.emit(type || e.type, e);
++    e.propagationStopped = !1, e.propagationImmediatelyStopped = !1, e.defaultPrevented = !1, this.propagate(e, type), this.dispatch.emit(type || e.type, e);
+   }
+   /**
+    * Maps the given upstream event through the event boundary and propagates it downstream.

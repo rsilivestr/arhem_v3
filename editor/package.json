@@ -42,7 +42,8 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "next": "patches/next.patch"
+      "next": "patches/next.patch",
+      "@pixi/events": "patches/@pixi__events.patch"
     }
   }
 }
