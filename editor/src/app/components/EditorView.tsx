@@ -9,17 +9,16 @@ export function EditorView() {
   const { ref, width, height } = useElementSize();
 
   return (
-    <div className="grow" ref={ref}>
+    <div className="grow bg-slate-200 dark:bg-slate-800" ref={ref}>
       <Stage
         width={width}
         height={height}
         options={{
           antialias: true,
-          backgroundAlpha: 0.25,
-          backgroundColor: '#888',
+          backgroundAlpha: 0,
         }}
       >
-        <EventStepView id="abc" text="hello world!" position={[0, 0]} />
+        <EventStepView id="abc" text="hello world!" position={[100, 500]} />
       </Stage>
     </div>
   );

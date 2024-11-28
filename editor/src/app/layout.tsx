@@ -37,9 +37,7 @@ export default function RootLayout({
           </div>
         </header>
         <Providers>
-          <main className="h-0 grow bg-slate-100 dark:bg-slate-900">
-            {children}
-          </main>
+          <main className="h-0 grow">{children}</main>
         </Providers>
       </body>
     </html>
