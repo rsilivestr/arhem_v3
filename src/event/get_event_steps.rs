@@ -1,14 +1,8 @@
 use rocket::{post, serde::json::Json, State, response::status::Custom, http::Status};
-use serde::Deserialize;
 use sqlx::PgPool;
 
-use crate::models::EventStep;
+use crate::models::{EventStep, EventGuid};
 use crate::system::admin_token::AdminToken;
-
-#[derive(Debug, Deserialize)]
-pub struct EventGuid {
-    guid: String
-}
 
 #[post("/get_event_steps", format = "application/json", data = "<guid>")]
 pub async fn get_event_steps(pool: &State<PgPool>, guid: Json<EventGuid>, _user_guid: AdminToken) -> Result<Json<Vec<EventStep>>, Custom<String>> {

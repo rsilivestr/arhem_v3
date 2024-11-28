@@ -25,6 +25,8 @@ use crate::event::get_events::get_events;
 use crate::event::create_event::create_event;
 use crate::event::get_event_steps::get_event_steps;
 use crate::event::create_event_step::create_event_step;
+use crate::event::create_event_link::create_event_link;
+use crate::event::get_event_shema::get_event_shema;
 
 mod manual {
     use std::path::{PathBuf, Path};
@@ -89,6 +91,7 @@ async fn rocket() -> _ {
         .mount("/api",  routes![
             user_create, user_login, check_token, admin_login,
             get_events, create_event, get_event_steps, create_event_step,
+            create_event_link, get_event_shema,
         ])
         .manage(pool)
         .attach(cors)

@@ -45,6 +45,11 @@ pub struct Event {
     pub user: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct EventGuid {
+    pub guid: String
+}
+
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct NewEventStep {
     pub guid: String,
@@ -65,6 +70,31 @@ pub struct EventStep {
     pub name: String,
     pub text: String,
     pub image: Option<String>,
+    pub date_create: String,
+    pub date_update: String,
+    pub user: String,
+}
+
+#[derive(Serialize, FromRow, Deserialize)]
+pub struct NewEventLink {
+    pub guid: String,
+    pub step_guid: String,
+    pub name: String,
+    pub description: Option<String>,
+    pub lose_time: Option<i32>,
+    pub next_step_win:String,
+    pub next_step_lose: Option<String>,
+}
+
+#[derive(Serialize, FromRow, Deserialize)]
+pub struct EventLink {
+    pub guid: String,
+    pub step_guid: String,
+    pub name: String,
+    pub description: Option<String>,
+    pub lose_time: Option<i32>,
+    pub next_step_win:String,
+    pub next_step_lose: Option<String>,
     pub date_create: String,
     pub date_update: String,
     pub user: String,
