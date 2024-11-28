@@ -26,7 +26,17 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body
-        className={`flex flex-col min-h-screen ${firaCode.variable} antialiased`}
+        className={`
+          flex
+          flex-col
+          min-h-screen
+          bg-slate-200
+          dark:bg-slate-900
+          text-slate-950
+          dark:text-white
+          ${firaCode.variable}
+          antialiased
+        `}
       >
         <header className="h-14 px-4 flex items-center text-white bg-pink-800">
           <Link href="/" className="text-lg font-bold">
