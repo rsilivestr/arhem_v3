@@ -3,7 +3,7 @@
 import { Stage } from '@pixi/react';
 
 import { useElementSize } from '../hooks/useResizeObserver';
-import { EventStepView } from './EventStepView';
+import { EditorGrid } from './EditorGrid';
 
 export function EditorView() {
   const { ref, width, height } = useElementSize();
@@ -18,7 +18,7 @@ export function EditorView() {
           backgroundAlpha: 0,
         }}
       >
-        <EventStepView id="abc" text="hello world!" position={[100, 500]} />
+        <EditorGrid />
       </Stage>
     </div>
   );
