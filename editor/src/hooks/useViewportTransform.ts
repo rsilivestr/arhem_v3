@@ -2,6 +2,11 @@ import { FederatedWheelEvent } from '@pixi/events';
 import { useApp } from '@pixi/react';
 import { useEffect } from 'react';
 
+import {
+  EDITOR_CELL_HEIGHT,
+  EDITOR_CELL_WIDTH,
+  EDITOR_PADDING,
+} from '@/config';
 import { EventButton } from '@/constants';
 import { useEditorViewport } from '@/store/editor/viewport';
 
@@ -9,7 +14,17 @@ import { usePointerDrag } from './usePointerDrag';
 
 export function useViewportTransform() {
   const app = useApp();
-  const { tx, ty, translate } = useEditorViewport();
+  const { tx, ty, translate, setMaxTranslate } = useEditorViewport();
+
+  useEffect(() => {
+    setMaxTranslate(
+      app.stage.width - app.screen.width + EDITOR_PADDING,
+      app.stage.height - app.screen.height + EDITOR_PADDING
+    );
+    // Callback can be safely omitted.
+    // Stage dimensions increase on scroll and should be omitted.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.screen.width, app.screen.height]);
 
   useEffect(() => {
     const stage = app.stage;
@@ -19,9 +34,9 @@ export function useViewportTransform() {
     const handleWheel = ({ deltaY, shiftKey }: FederatedWheelEvent) => {
       const dirMod = deltaY > 0 ? -1 : 1;
       if (shiftKey) {
-        translate(250 * dirMod, 0);
+        translate((EDITOR_CELL_WIDTH / 2) * dirMod, 0);
       } else {
-        translate(0, 150 * dirMod);
+        translate(0, (EDITOR_CELL_HEIGHT / 2) * dirMod);
       }
     };
     stage.on('wheel', handleWheel);
