@@ -5,7 +5,7 @@ pub async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
     pool.execute(
         r#"
         CREATE TABLE IF NOT EXISTS users (
-            guid VARCHAR(25) PRIMARY KEY,
+            id VARCHAR(25) PRIMARY KEY,
             username VARCHAR(255) NOT NULL UNIQUE,
             password_hash VARCHAR(255) NOT NULL,
             admin BOOLEAN NOT NULL,
@@ -20,7 +20,7 @@ pub async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
         );
         CREATE TABLE IF NOT EXISTS users_log(
             time TIMESTAMPTZ,
-            user_guid VARCHAR(25) REFERENCES users(guid),
+            user_id VARCHAR(25) REFERENCES users(id),
             text_id SERIAL REFERENCES users_log_text(id)
         );
         CREATE TABLE IF NOT EXISTS locations (
@@ -30,51 +30,57 @@ pub async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
             date_update TIMESTAMP
         );
         CREATE TABLE IF NOT EXISTS events (
-            guid VARCHAR(25) PRIMARY KEY,
+            id VARCHAR(25) PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             description TEXT NULL,
             image VARCHAR(255) NULL,
-            --persona INTEGER NOT NULL,
-            --stage INTEGER NOT NULL,
-            --location_id INTEGER NULL,
+            max_cols SMALLINT,
+            max_rows SMALLINT,
             date_create TIMESTAMPTZ,
             date_update TIMESTAMPTZ,
-            user_guid VARCHAR(25) REFERENCES users(guid)
+            user_id VARCHAR(25) REFERENCES users(id)
         );
         CREATE TABLE IF NOT EXISTS event_steps (
-            guid VARCHAR(25) PRIMARY KEY,
-            event_guid VARCHAR(25) REFERENCES events(guid),
-            start BOOLEAN NOT NULL,
-            finish BOOLEAN NOT NULL,
+            id VARCHAR(25) PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             text TEXT NOT NULL,
             image VARCHAR(255) NULL,
             date_create TIMESTAMPTZ,
             date_update TIMESTAMPTZ,
-            user_guid VARCHAR(25) REFERENCES users(guid)
+            user_id VARCHAR(25) REFERENCES users(id)
         );
-        CREATE TABLE IF NOT EXISTS event_options (
-            guid VARCHAR(25) PRIMARY KEY,
-            code VARCHAR(255),
-            parameter VARCHAR(25),
-            value Integer
+        CREATE TABLE IF NOT EXISTS event_x_steps(
+            event_id VARCHAR(25) REFERENCES events(id),
+            step_id VARCHAR(25) REFERENCES event_steps(id),
+            start BOOLEAN,
+            row SMALLINT,
+            col SMALLINT
         );
         CREATE TABLE IF NOT EXISTS event_links (
-            guid VARCHAR(25) PRIMARY KEY,
-            step_guid VARCHAR(25) REFERENCES event_steps(guid),
+            id VARCHAR(25) PRIMARY KEY,
+            step_id VARCHAR(25) REFERENCES event_steps(id),
+            output SMALLINT,
+            next_step_win VARCHAR(25) REFERENCES event_steps(id),
+            input_win SMALLINT,
+            next_step_fail VARCHAR(25) NULL,
+            input_fail SMALLINT NULL,
+            FOREIGN KEY (next_step_lose) REFERENCES event_steps(id),
             name VARCHAR(255) NOT NULL,
             description TEXT NULL,
-            lose_time Integer NULL,
-            next_step_win VARCHAR(25) REFERENCES event_steps(guid),
-            next_step_lose VARCHAR(25) NULL,
-            FOREIGN KEY (next_step_lose) REFERENCES event_steps(guid),
+            lose_time SMALLINT NULL,
             date_create TIMESTAMPTZ,
             date_update TIMESTAMPTZ,
-            user_guid VARCHAR(25) REFERENCES users(guid)
+            user_id VARCHAR(25) REFERENCES users(id)
+        );
+        CREATE TABLE IF NOT EXISTS event_options (
+            id VARCHAR(25) PRIMARY KEY,
+            code VARCHAR(255),
+            parameter VARCHAR(25),
+            value SMALLINT
         );
         CREATE TABLE IF NOT EXISTS event_links_x_options(
-            link_guid VARCHAR(25) REFERENCES event_links(guid),
-            option_guid VARCHAR(25) REFERENCES event_options(guid)
+            link_id VARCHAR(25) REFERENCES event_links(id),
+            option_id VARCHAR(25) REFERENCES event_options(id)
         );
         "#,
     )

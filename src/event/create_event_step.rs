@@ -7,26 +7,45 @@ use crate::system::admin_token::AdminToken;
 use crate::system::user_log_creation::user_log_creation;
 
 #[post("/event_step", format = "application/json", data = "<event_step>")]
-pub async fn create_event_step(pool: &State<PgPool>, event_step: Json<NewEventStep>, user_guid: AdminToken) -> Result<Json<EventStep>, Custom<String>> {
+pub async fn create_event_step(pool: &State<PgPool>, event_step: Json<NewEventStep>, user_id: AdminToken) -> Result<Json<EventStep>, Custom<String>> {
     let new_event = event_step.into_inner();
     let now = Utc::now();
+    // проверяем таблицу step на наличие такой строчки, если полное совпадение, ничего не делаем.
+    // просто инсертим в связи
+    // если неполное, нужно проверить, если такой степ в event_x_steps с другими event
+    // если есть - меняем id step на новый и заливаем
+    // если нет - апдейтим step на новый 
+    // есть в бд? проверяем таблицу связей event_x_steps
+    // если в ней уже
+
+
+    // 1 проверям step на наличие в steps на name text image
+    let query = r#"SELECT
+    EXISTS (SELECT 1 FROM event_steps
+        WHERE id = $1 AND name = $2 AND text = $3 AND image = $4
+    ) AS full_match,
+    EXISTS (SELECT 1 FROM event_steps WHERE id = $1) AS id_match;"#;
+
+    let step_exists: (bool, bool) = match query_as::<_, (bool, bool)> (query)
+        .bind(&new_event)
+
 
     let query = r#"
         WITH inserted AS (
             INSERT INTO event_steps (
-                guid, event_guid, start, finish, name, text, image, date_create, date_update, user_guid
+                id, name, text, image, date_create, date_update, user_id
             )
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8, $9)
-            ON CONFLICT (guid)
+            ON CONFLICT (id)
             DO UPDATE
-                SET event_guid = EXCLUDED.event_guid,
+                SET event_id = EXCLUDED.event_id,
                     start = EXCLUDED.start,
                     finish = EXCLUDED.finish,
                     name = EXCLUDED.name,
                     text = EXCLUDED.text,
                     image = EXCLUDED.image,
                     date_update = EXCLUDED.date_update,
-                    user_guid = EXCLUDED.user_guid
+                    user_id = EXCLUDED.user_guid
             RETURNING guid, event_guid, start, finish, name, text, image, date_create, date_update, user_guid
         )
         SELECT

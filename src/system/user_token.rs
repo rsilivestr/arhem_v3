@@ -24,13 +24,13 @@ impl<'r> FromRequest<'r> for UserToken {
 
         match token {
             Some(token) => {
-                let query = r#"SELECT guid FROM users WHERE token = $1;"#;
+                let query = r#"SELECT id FROM users WHERE token = $1;"#;
                 match sqlx::query_scalar::<_, String>(query)
                     .bind(&token)
                     .fetch_one(pool)
                     .await
                 {
-                    Ok(user_guid) => Outcome::Success(UserToken(user_guid)),
+                    Ok(user_id) => Outcome::Success(UserToken(user_id)),
                     Err(_) => Outcome::Error((Status::Unauthorized, ApiTokenError::Invalid)),
                 }
             }

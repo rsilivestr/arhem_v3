@@ -8,52 +8,62 @@ use crate::system::user_log_creation::user_log_creation;
 
 
 #[post("/event_link", format = "application/json", data = "<event_link>")]
-pub async fn create_event_link(pool: &State<PgPool>, event_link: Json<NewEventLink>, user_guid: AdminToken) -> Result<Json<EventLink>, Custom<String>> {
+pub async fn create_event_link(pool: &State<PgPool>, event_link: Json<NewEventLink>, user_id: AdminToken) -> Result<Json<EventLink>, Custom<String>> {
     let new_link = event_link.into_inner();
     let now = Utc::now();
 
     let query = r#"
         WITH inserted AS (
             INSERT INTO event_links (
-                guid, step_guid, name, description, lose_time, next_step_win, next_step_lose, date_create, date_update, user_guid
+                id, step_id, output, next_step_win, input_win,
+                next_step_fail, input_fail, name, description, lose_time,
+                date_create, date_update, user_id
             )
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8, $9)
-            ON CONFLICT (guid)
+            ON CONFLICT (id)
             DO UPDATE
-                SET step_guid = EXCLUDED.step_guid,
+                SET step_id = EXCLUDED.step_id,
+                    output = EXCLUDED.output,
+                    next_step_win = EXCLUDED.next_step_win,
+                    input_win = EXCLUDED.next_step_win,
+                    next_step_lose = EXCLUDED.next_step_lose,
+                    input_fail = EXCLUDED.input_fail,
                     name = EXCLUDED.name,
                     description = EXCLUDED.description,
                     lose_time = EXCLUDED.lose_time,
-                    next_step_win = EXCLUDED.next_step_win,
-                    next_step_lose = EXCLUDED.next_step_lose,
                     date_update = EXCLUDED.date_update,
-                    user_guid = EXCLUDED.user_guid
-            RETURNING guid, step_guid, name, description, lose_time, next_step_win, next_step_lose, date_create, date_update, user_guid
+                    user_id = EXCLUDED.user_id
+            RETURNING id, step_id, output, next_step_win, input_win,
+                next_step_fail, input_fail, name, description, lose_time,
+                date_create, date_update, user_id
         )
         SELECT
-            i.guid,
-            i.step_guid,
+            i.id,
+            i.step_id,
+            i.output,
+            i.next_step_win,
+            i.input_win,
+            i.next_step_fail,
+            i.input_fail,
             i.name,
             i.description,
             i.lose_time,
-            i.next_step_win,
-            i.next_step_lose,
             to_char(i.date_create AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_create,
             to_char(i.date_update AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_update,
             u.username as user
         FROM inserted i
-        JOIN users u ON i.user_guid = u.guid;"#;
+        JOIN users u ON i.user_id = u.id;"#;
 
     let inserted_link: EventLink = match sqlx::query_as::<_, EventLink>(query)
-        .bind(&new_link.guid)
-        .bind(&new_link.step_guid)
+        .bind(&new_link.id)
+        .bind(&new_link.step_id)
         .bind(&new_link.name)
         .bind(&new_link.description)
         .bind(new_link.lose_time)
         .bind(&new_link.next_step_win)
         .bind(&new_link.next_step_lose)
         .bind(now)
-        .bind(&user_guid.0)
+        .bind(&user_id.0)
         .fetch_one(pool.inner())
         .await
     {
@@ -63,7 +73,7 @@ pub async fn create_event_link(pool: &State<PgPool>, event_link: Json<NewEventLi
         }
     };
 
-    user_log_creation(pool.inner(), &user_guid.0, "Добавил новый event_link или изменил старый").await?;
+    user_log_creation(pool.inner(), &user_id.0, "Добавил новый event_link или изменил старый").await?;
 
     Ok(Json(inserted_link))
 }

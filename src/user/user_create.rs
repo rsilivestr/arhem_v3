@@ -10,7 +10,7 @@ use crate::system::user_log_creation::user_log_creation;
 #[post("/users", format = "application/json", data = "<credentials>")]
 pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -> Result<Json<User>, Custom<String>> {
     let new_user = credentials.into_inner();
-    let guid = cuid2();
+    let id = cuid2();
     let date_create = Utc::now();
 
     // Check if the username already exists
@@ -32,13 +32,13 @@ pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -
     })?;
 
     let query = r#"
-        INSERT INTO users (guid, username, password_hash, admin, donate, active, token, date_create)
+        INSERT INTO users (id, username, password_hash, admin, donate, active, token, date_create)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING guid, username, password_hash, admin, donate, active, token, date_create;
+        RETURNING id, username, password_hash, admin, donate, active, token, date_create;
     "#;
 
     let inserted_user: User = match query_as::<_, User>(query)
-        .bind(&guid)
+        .bind(&id)
         .bind(&new_user.username)
         .bind(&password_hash)
         .bind(false) // Default value for admin
@@ -57,7 +57,7 @@ pub async fn user_create(pool: &State<PgPool>, credentials: Json<Credentials>) -
         }
     };
 
-    user_log_creation(pool.inner(), &inserted_user.guid, "Пользователь создан").await?;
+    user_log_creation(pool.inner(), &inserted_user.id, "Пользователь создан").await?;
 
     Ok(Json(inserted_user))
 }

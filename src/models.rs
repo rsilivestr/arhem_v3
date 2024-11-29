@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct User {
-    pub guid: String,
+    pub id: String,
     pub username: String,
     pub password_hash: String,
     pub admin: bool,
@@ -28,34 +28,39 @@ pub struct LoginResponse {
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct NewEvent {
-    pub guid: String,
+    pub id: String,
     pub name: String,
     pub description: Option<String>,
     pub image: Option<String>,
+    pub max_cols: i16,
+    pub max_rows: i16,
 }
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct Event {
-    pub guid: String,
+    pub id: String,
     pub name: String,
     pub description: Option<String>,
     pub image: Option<String>,
+    pub max_cols: i16,
+    pub max_rows: i16,
     pub date_create: String,
     pub date_update: String,
     pub user: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct EventGuid {
-    pub guid: String
+pub struct EventId {
+    pub id: String
 }
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct NewEventStep {
-    pub guid: String,
-    pub event_guid: String,
+    pub id: String,
+    pub event_id: String,
     pub start: bool,
-    pub finish: bool,
+    pub col: i16,
+    pub row: i16,
     pub name: String,
     pub text: String,
     pub image: Option<String>,
@@ -63,10 +68,7 @@ pub struct NewEventStep {
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct EventStep {
-    pub guid: String,
-    pub event_guid: String,
-    pub start: bool,
-    pub finish: bool,
+    pub id: String,
     pub name: String,
     pub text: String,
     pub image: Option<String>,
@@ -77,24 +79,30 @@ pub struct EventStep {
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct NewEventLink {
-    pub guid: String,
-    pub step_guid: String,
+    pub id: String,
+    pub step_id: String,
+    pub output:  i16,
+    pub next_step_win:String,
+    pub input_win: i16,
+    pub next_step_fail: Option<String>,
+    pub input_fail: Option<i16>,
     pub name: String,
     pub description: Option<String>,
-    pub lose_time: Option<i32>,
-    pub next_step_win:String,
-    pub next_step_lose: Option<String>,
+    pub lose_time: Option<i16>,
 }
 
 #[derive(Serialize, FromRow, Deserialize)]
 pub struct EventLink {
-    pub guid: String,
-    pub step_guid: String,
+    pub id: String,
+    pub step_id: String,
+    pub output:  i16,
+    pub next_step_win:String,
+    pub input_win: i16,
+    pub next_step_fail: Option<String>,
+    pub input_fail: Option<i16>,
     pub name: String,
     pub description: Option<String>,
-    pub lose_time: Option<i32>,
-    pub next_step_win:String,
-    pub next_step_lose: Option<String>,
+    pub lose_time: Option<i16>,
     pub date_create: String,
     pub date_update: String,
     pub user: String,
