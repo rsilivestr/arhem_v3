@@ -6,6 +6,7 @@ import {
   EDITOR_CELL_RADIUS,
   EDITOR_CELL_WIDTH,
 } from '@/config';
+import { useTheme } from '@/hooks/useTheme';
 
 const ICON_SIZE = Math.ceil(EDITOR_CELL_HEIGHT / 2.5);
 const ICON_STROKE = Math.ceil(ICON_SIZE / 10);
@@ -20,14 +21,14 @@ type Props = {
 
 export function EditorGridCell({ x, y }: Props) {
   const [isHovered, setIsHovered] = useState(false);
+  const { colors } = useTheme();
 
   return (
     <Container x={x} y={y}>
       <Graphics
         draw={(g) => {
           g.clear();
-          // slate-700 hover:slate-600
-          g.beginFill(isHovered ? '#475569' : '#334155');
+          g.beginFill(isHovered ? colors.cell.hover : colors.cell.main);
           g.drawRoundedRect(
             0,
             0,
@@ -46,8 +47,7 @@ export function EditorGridCell({ x, y }: Props) {
         y={ICON_TOP}
         draw={(g) => {
           g.clear();
-          // slate-700
-          g.beginFill('#334155');
+          g.beginFill(colors.cell.icon);
           g.drawRect(STROKE_OFFSET, 0, ICON_STROKE, ICON_SIZE);
           g.drawRect(0, STROKE_OFFSET, ICON_SIZE, ICON_STROKE);
           g.endFill();

@@ -3,12 +3,15 @@
 import { Sprite, Stage } from '@pixi/react';
 import { Texture } from 'pixi.js';
 
+import { clientOnly } from '@/hoc/clientOnly';
 import { useElementSize } from '@/hooks/useResizeObserver';
+import { useTheme } from '@/hooks/useTheme';
 
 import { EditorView } from './EditorView';
 
-export function EditorRoot() {
+export const EditorRoot = clientOnly(function EditorRoot() {
   const { ref, width, height } = useElementSize();
+  const { colors } = useTheme();
 
   return (
     <div className="grow bg-slate-200 dark:bg-slate-800" ref={ref}>
@@ -17,13 +20,17 @@ export function EditorRoot() {
         height={height}
         options={{
           antialias: true,
-          backgroundAlpha: 0,
           eventMode: 'static',
         }}
       >
-        <Sprite width={width} height={height} texture={Texture.EMPTY} />
+        <Sprite
+          width={width}
+          height={height}
+          texture={Texture.WHITE}
+          tint={colors.bg}
+        />
         <EditorView />
       </Stage>
     </div>
   );
-}
+});
