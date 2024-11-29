@@ -1,14 +1,16 @@
 import { Container, Graphics } from '@pixi/react';
 import { useMemo } from 'react';
 
+import {
+  EDITOR_CELL_HEIGHT,
+  EDITOR_CELL_WIDTH,
+  EDITOR_GRID_GAP,
+  EDITOR_PADDING,
+} from '@/config';
 import { useEditorGrid } from '@/store/editor/grid';
 
-const GRID_PADDING = 100;
-const CELL = {
-  width: 400,
-  height: 200,
-  gap: 200,
-};
+const colOffset = EDITOR_CELL_WIDTH + EDITOR_GRID_GAP;
+const rowOffset = EDITOR_CELL_HEIGHT + EDITOR_GRID_GAP;
 
 export function EditorGrid() {
   const grid = useEditorGrid();
@@ -18,19 +20,19 @@ export function EditorGrid() {
   );
 
   return (
-    <Container x={GRID_PADDING} y={GRID_PADDING}>
+    <Container x={EDITOR_PADDING} y={EDITOR_PADDING}>
       {cells.map((c, index) => {
-        const colIndex = (index % grid.columns)
-        const rowIndex = Math.floor(index / grid.rows)
+        const colIndex = index % grid.columns;
+        const rowIndex = Math.floor(index / grid.rows);
         return (
           <Graphics
             key={`${colIndex}/${rowIndex}`}
-            x={colIndex * (CELL.width + CELL.gap)}
-            y={rowIndex * (CELL.height + CELL.gap)}
+            x={colIndex * colOffset}
+            y={rowIndex * rowOffset}
             draw={(g) => {
               g.clear();
               g.beginFill('#334155');
-              g.drawRect(0, 0, CELL.width, CELL.height);
+              g.drawRect(0, 0, EDITOR_CELL_WIDTH, EDITOR_CELL_HEIGHT);
               g.endFill();
             }}
           />
