@@ -18,7 +18,7 @@ export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
       </label>
       <input
         id={inputId}
-        className="px-2 py-1 dark:bg-slate-700"
+        className="px-2 py-1 dark:bg-slate-600"
         ref={inputRef}
         {...inputProps}
       />
