@@ -26,11 +26,11 @@ pub async fn create_event_step(pool: &State<PgPool>, event_step: Json<NewEventSt
 
     // 1 проверям step на наличие в steps на name text image
     let query_ = r#"SELECT
-    EXISTS (SELECT 1 FROM event_x_steps WHERE id = $1) AS id_match,
+    EXISTS (SELECT 1 FROM event_steps WHERE id = $1) AS id_match,
     EXISTS (SELECT 1 FROM event_steps
         WHERE id = $1 AND name = $2 AND text = $3 AND image = $4
     ) AS full_match,
-    EXISTS (SELECT 1 FROM event_xsteps where event_id = $5 and step_id = $1) as this_event,
+    EXISTS (SELECT 1 FROM event_x_steps where event_id = $5 and step_id = $1) as this_event,
     EXISTS (SELECT 1 FROM event_x_steps where event_id != $5 and step_id = $1) as else_event;"#;
     // (наличие step, полное совпадение step, наличие связки с диалогом, с другим диалогом )
     let message: String = match query_as::<_, (bool, bool, bool, bool)> (query_)
