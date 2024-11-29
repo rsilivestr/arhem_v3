@@ -97,7 +97,7 @@ pub async fn create_event_step(pool: &State<PgPool>, event_step: Json<NewEventSt
 async fn update_event_x_steps(pool: &PgPool, new_event: &NewEventStep, new_step_id: &str) -> Result<(), Custom<String>> {
     query(r#"UPDATE event_x_steps 
         set start = $1, row = $2, col = $3
-        where event_id = $4 and step_id = $5"#)
+        where event_id = $4 and step_id = $5;"#)
         .bind(&new_event.start)
         .bind(&new_event.row)
         .bind(&new_event.col)
@@ -111,7 +111,7 @@ async fn update_event_x_steps(pool: &PgPool, new_event: &NewEventStep, new_step_
 }
 
 async fn insert_event_x_steps(pool: &PgPool, new_event: &NewEventStep) -> Result<(), Custom<String>> {
-    query(r#"INSERT INTO event_x_steps VALUES($1, $2, $3, $4, $5"#)
+    query(r#"INSERT INTO event_x_steps VALUES($1, $2, $3, $4, $5);"#)
         .bind(&new_event.event_id)
         .bind(&new_event.id)
         .bind(&new_event.start)
