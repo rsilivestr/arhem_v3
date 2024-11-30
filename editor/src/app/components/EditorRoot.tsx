@@ -14,7 +14,10 @@ export const EditorRoot = clientOnly(function EditorRoot() {
   const { colors } = useTheme();
 
   return (
-    <div className="grow bg-slate-200 dark:bg-slate-800" ref={ref}>
+    <div
+      className="grow overflow-hidden bg-slate-200 dark:bg-slate-800"
+      ref={ref}
+    >
       <Stage
         width={width}
         height={height}

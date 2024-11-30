@@ -8,8 +8,6 @@ import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '@/config';
 import { useSession } from '@/store/session';
 
-import { SearchIcon } from './icons/SearchIcon';
-
 type EventsRespose = Array<{
   id: string;
   name: string;
@@ -21,7 +19,11 @@ type EventsRespose = Array<{
   user: string;
 }>;
 
-export function EventList() {
+type Props = {
+  filter: string;
+};
+
+export function EventList({ filter }: Props) {
   const { token } = useSession();
 
   const { data: events } = useQuery({
@@ -45,7 +47,6 @@ export function EventList() {
     },
   });
 
-  const [filterTerm, setFilterTerm] = useState('');
   const [filteredEvents, setFilteredEvents] = useState(events || []);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export function EventList() {
       return;
     }
     const tid = setTimeout(() => {
-      const term = filterTerm.trim().toLocaleLowerCase();
+      const term = filter.trim().toLocaleLowerCase();
       setFilteredEvents(
         term.length > 0
           ? events.filter(
@@ -67,42 +68,31 @@ export function EventList() {
     return () => {
       clearTimeout(tid);
     };
-  }, [events, filterTerm]);
+  }, [events, filter]);
 
   return (
-    <aside className="min-w-[400px] flex flex-col overflow-hidden bg-slate-300 dark:bg-slate-900">
-      <div className="relative">
-        <SearchIcon className="absolute h-full w-auto p-2" />
-        <input
-          type="search"
-          className="w-full pl-10 pr-4 py-2 dark:bg-slate-600"
-          value={filterTerm}
-          onChange={(e) => setFilterTerm(e.target.value)}
-        />
-      </div>
-      <ul className="overflow-auto">
-        {filteredEvents?.map((evt) => (
-          <li
-            key={evt.id}
-            className="border-b border-slate-200 dark:border-slate-700"
+    <ul className="overflow-auto">
+      {filteredEvents?.map((evt) => (
+        <li
+          key={evt.id}
+          className="border-b border-slate-200 dark:border-slate-700"
+        >
+          <Link
+            href={{
+              query: { event: evt.id },
+              slashes: true,
+            }}
+            className="px-4 py-2 flex flex-col hover:bg-slate-400 dark:hover:bg-slate-800"
           >
-            <Link
-              href={{
-                query: { event: evt.id },
-                slashes: true,
-              }}
-              className="px-4 py-2 flex flex-col hover:bg-slate-400 dark:hover:bg-slate-800"
-            >
-              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                {evt.name}
-              </span>
-              <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {evt.code_name}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </aside>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+              {evt.name}
+            </span>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+              {evt.code_name}
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
