@@ -1,25 +1,15 @@
-'use client';
+import { Container } from '@pixi/react';
 
-import { Stage } from '@pixi/react';
+import { useViewportTransform } from '@/hooks/useViewportTransform';
 
-import { useElementSize } from '../hooks/useResizeObserver';
-import { EventStepView } from './EventStepView';
+import { EditorGrid } from './EditorGrid';
 
 export function EditorView() {
-  const { ref, width, height } = useElementSize();
+  const { tx, ty } = useViewportTransform();
 
   return (
-    <div className="grow bg-slate-200 dark:bg-slate-800" ref={ref}>
-      <Stage
-        width={width}
-        height={height}
-        options={{
-          antialias: true,
-          backgroundAlpha: 0,
-        }}
-      >
-        <EventStepView id="abc" text="hello world!" position={[100, 500]} />
-      </Stage>
-    </div>
+    <Container x={tx} y={ty}>
+      <EditorGrid />
+    </Container>
   );
 }

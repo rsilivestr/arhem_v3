@@ -1,21 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --bg: #ffffff;
-  --fg: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0a0a0a;
-    --fg: #ededed;
-  }
-}
-
-body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: 'Fira Code', Helvetica, sans-serif;
-}

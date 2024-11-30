@@ -20,7 +20,7 @@
     "@tanstack/react-query": "^5",
     "ky": "^1",
     "next": "^14",
-    "pixijs": "^7",
+    "pixi.js": "7",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7",
@@ -42,7 +42,8 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "next": "patches/next.patch"
+      "next": "patches/next.patch",
+      "@pixi/events": "patches/@pixi__events.patch"
     }
   }
 }

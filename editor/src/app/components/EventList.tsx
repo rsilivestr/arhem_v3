@@ -70,12 +70,12 @@ export function EventList() {
   }, [events, filterTerm]);
 
   return (
-    <aside className="min-w-[400px] flex flex-col overflow-hidden bg-slate-100 dark:bg-slate-900">
+    <aside className="min-w-[400px] flex flex-col overflow-hidden bg-slate-300 dark:bg-slate-900">
       <div className="relative">
         <SearchIcon className="absolute h-full w-auto p-2" />
         <input
           type="search"
-          className="w-full pl-10 pr-4 py-2 dark:bg-slate-700"
+          className="w-full pl-10 pr-4 py-2 dark:bg-slate-600"
           value={filterTerm}
           onChange={(e) => setFilterTerm(e.target.value)}
         />
@@ -91,7 +91,7 @@ export function EventList() {
                 query: { event: evt.id },
                 slashes: true,
               }}
-              className="px-4 py-2 flex flex-col hover:bg-slate-200 dark:hover:bg-slate-800"
+              className="px-4 py-2 flex flex-col hover:bg-slate-400 dark:hover:bg-slate-800"
             >
               <span className="overflow-hidden text-ellipsis whitespace-nowrap">
                 {evt.name}
