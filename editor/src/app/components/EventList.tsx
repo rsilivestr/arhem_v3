@@ -11,7 +11,7 @@ import { useSession } from '@/store/session';
 import { SearchIcon } from './icons/SearchIcon';
 
 type EventsRespose = Array<{
-  guid: string;
+  id: string;
   name: string;
   code_name: string;
   description: string | null;
@@ -83,12 +83,12 @@ export function EventList() {
       <ul>
         {filteredEvents?.map((evt) => (
           <li
-            key={evt.guid}
+            key={evt.id}
             className="border-b border-slate-200 dark:border-slate-700"
           >
             <Link
               href={{
-                query: { event: evt.guid },
+                query: { event: evt.id },
                 slashes: true,
               }}
               className="px-4 py-2 flex flex-col hover:bg-slate-200 dark:hover:bg-slate-800"
