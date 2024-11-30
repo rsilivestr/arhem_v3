@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useForm, ValidationRule } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
-import { useSession } from '@/store/session';
 
 import { TextField } from '../components/TextField';
 
@@ -28,7 +27,6 @@ const required: ValidationRule<boolean> = {
 
 export default function Login() {
   const router = useRouter();
-  const session = useSession();
 
   const { isError, mutate: registerUser } = useMutation({
     mutationFn: async (json: UserCredentials) => {
@@ -36,8 +34,7 @@ export default function Login() {
         .post(`${API_BASE_URL}/users`, { json })
         .json<UserRegisterResponse>();
     },
-    onSuccess: ({ token }, { username }) => {
-      session.put({ token, username });
+    onSuccess: () => {
       router.push('/login');
     },
   });
