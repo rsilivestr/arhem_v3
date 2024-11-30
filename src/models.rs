@@ -72,6 +72,8 @@ pub struct EventStep {
     pub name: String,
     pub text: String,
     pub image: Option<String>,
+    pub col: i16,
+    pub row: i16,
     pub date_create: String,
     pub date_update: String,
     pub user: String,

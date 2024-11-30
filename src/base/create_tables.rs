@@ -64,7 +64,7 @@ pub async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
             input_win SMALLINT,
             next_step_fail VARCHAR(25) NULL,
             input_fail SMALLINT NULL,
-            FOREIGN KEY (next_step_lose) REFERENCES event_steps(id),
+            FOREIGN KEY (next_step_fail) REFERENCES event_steps(id),
             name VARCHAR(255) NOT NULL,
             description TEXT NULL,
             lose_time SMALLINT NULL,
