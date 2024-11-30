@@ -70,7 +70,7 @@ export function EventList() {
   }, [events, filterTerm]);
 
   return (
-    <aside className="min-w-[400px]">
+    <aside className="min-w-[400px] flex flex-col overflow-hidden bg-slate-100 dark:bg-slate-900">
       <div className="relative">
         <SearchIcon className="absolute h-full w-auto p-2" />
         <input
@@ -80,7 +80,7 @@ export function EventList() {
           onChange={(e) => setFilterTerm(e.target.value)}
         />
       </div>
-      <ul>
+      <ul className="overflow-auto">
         {filteredEvents?.map((evt) => (
           <li
             key={evt.id}
