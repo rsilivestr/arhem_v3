@@ -1,10 +1,10 @@
 import { EditorRoot } from './components/EditorRoot';
-import { EventList } from './components/EventList';
+import { EventNav } from './components/EventNav';
 
 export default function Home() {
   return (
-    <div className="h-full flex">
-      <EventList />
+    <div className="w-full h-full flex">
+      <EventNav />
       <EditorRoot />
     </div>
   );

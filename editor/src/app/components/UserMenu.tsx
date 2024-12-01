@@ -1,12 +1,11 @@
 'use client';
 
+import { ExitIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { clientOnly } from '@/hoc/clientOnly';
 import { useSession } from '@/store/session';
-
-import { ExitIcon } from './icons/ExitIcon';
 
 export const UserMenu = clientOnly(function UserMenu() {
   const pathname = usePathname();
@@ -22,11 +21,11 @@ export const UserMenu = clientOnly(function UserMenu() {
     <span className="flex items-center gap-4">
       {session.username ? (
         <>
-          <span className='text-lg'>{session.username}</span>
+          <span className="text-lg">{session.username}</span>
           <button
-            aria-label='Выйти'
+            aria-label="Выйти"
             className="p-1 hover:text-gray-300"
-            title='Выйти'
+            title="Выйти"
             type="button"
             onClick={handleExitClick}
           >
