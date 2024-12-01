@@ -1,5 +1,3 @@
-'use client';
-
 import { useMutation } from '@tanstack/react-query';
 import ky from 'ky';
 import { useRouter } from 'next/navigation';
@@ -7,14 +5,14 @@ import { useForm, ValidationRule } from 'react-hook-form';
 
 import { TextField } from '@/components/TextField';
 import { API_BASE_URL } from '@/config';
+import { useSession } from '@/store/session';
 
 type UserCredentials = {
   username: string;
   password: string;
-  passwordRepeat: string;
 };
 
-type UserRegisterResponse = {
+type UserLoginResponse = {
   token: string;
   message: string;
 };
@@ -26,21 +24,22 @@ const required: ValidationRule<boolean> = {
 
 export default function Login() {
   const router = useRouter();
+  const session = useSession();
 
-  const { isError, mutate: registerUser } = useMutation({
+  const { isError, mutate: login } = useMutation({
     mutationFn: async (json: UserCredentials) => {
       return await ky
-        .post(`${API_BASE_URL}/users`, { json })
-        .json<UserRegisterResponse>();
+        .post(`${API_BASE_URL}/admin_login`, { json })
+        .json<UserLoginResponse>();
     },
-    onSuccess: () => {
-      router.push('/login');
+    onSuccess: ({ token }, { username }) => {
+      session.put({ token, username });
+      router.push('/');
     },
   });
 
   const {
     formState: { errors },
-    getValues,
     register,
     handleSubmit,
   } = useForm<UserCredentials>();
@@ -49,7 +48,7 @@ export default function Login() {
     <div className="h-full py-64 flex justify-center">
       <form
         className="w-[300px] flex flex-col gap-4"
-        onSubmit={handleSubmit((cred) => registerUser(cred))}
+        onSubmit={handleSubmit((cred) => login(cred))}
       >
         <TextField
           label="Логин"
@@ -61,29 +60,20 @@ export default function Login() {
         <TextField
           label="Пароль"
           type="password"
-          autoComplete="new-password"
+          autoComplete="current-password"
           error={errors.password?.message}
           {...register('password', { required })}
-        />
-        <TextField
-          label="Подтверждение пароля"
-          type="password"
-          autoComplete="new-password"
-          error={errors.passwordRepeat?.message}
-          {...register('passwordRepeat', {
-            required,
-            validate: (value: string) =>
-              value === getValues('password') || 'Пароли не совпадают',
-          })}
         />
         <button
           className="px-2 py-1 text-white bg-pink-800 hover:bg-pink-900"
           type="submit"
         >
-          Создать пользователя
+          Войти
         </button>
         {isError && (
-          <p className="text-red-600 dark:text-red-400">Что-то пошло не так</p>
+          <p className="text-red-600 dark:text-red-400">
+            Неверное имя пользователя или пароль
+          </p>
         )}
       </form>
     </div>

@@ -1,5 +1,3 @@
-'use client';
-
 import { ExitIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';

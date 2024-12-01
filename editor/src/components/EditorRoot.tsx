@@ -1,5 +1,3 @@
-'use client';
-
 import { Sprite, Stage } from '@pixi/react';
 import { Texture } from 'pixi.js';
 
