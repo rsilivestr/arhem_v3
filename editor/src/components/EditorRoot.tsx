@@ -2,11 +2,10 @@ import { Sprite, Stage } from '@pixi/react';
 import { Texture } from 'pixi.js';
 
 import { EditorView } from '@/components/EditorView';
-import { clientOnly } from '@/hoc/clientOnly';
 import { useElementSize } from '@/hooks/useResizeObserver';
 import { useTheme } from '@/hooks/useTheme';
 
-export const EditorRoot = clientOnly(function EditorRoot() {
+export function EditorRoot() {
   const { ref, width, height } = useElementSize();
   const { colors } = useTheme();
 
@@ -33,4 +32,4 @@ export const EditorRoot = clientOnly(function EditorRoot() {
       </Stage>
     </div>
   );
-});
+}

@@ -2,10 +2,9 @@ import { ExitIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { clientOnly } from '@/hoc/clientOnly';
 import { useSession } from '@/store/session';
 
-export const UserMenu = clientOnly(function UserMenu() {
+export const UserMenu = function UserMenu() {
   const pathname = usePathname();
   const router = useRouter();
   const session = useSession();
@@ -49,4 +48,4 @@ export const UserMenu = clientOnly(function UserMenu() {
       )}
     </span>
   );
-});
+};
