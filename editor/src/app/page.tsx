@@ -1,5 +1,5 @@
-import { EditorRoot } from './components/EditorRoot';
-import { EventNav } from './components/EventNav';
+import { EditorRoot } from '@/components/EditorRoot';
+import { EventNav } from '@/components/EventNav';
 
 export default function Home() {
   return (

@@ -3,8 +3,9 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import Link from 'next/link';
 
-import { Providers } from './components/Providers';
-import { UserMenu } from './components/UserMenu';
+import { Providers } from '@/components/Providers';
+import { UserMenu } from '@/components/UserMenu';
+
 import './globals.css';
 
 const firaCode = localFont({

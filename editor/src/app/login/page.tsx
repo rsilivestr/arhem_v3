@@ -5,10 +5,9 @@ import ky from 'ky';
 import { useRouter } from 'next/navigation';
 import { useForm, ValidationRule } from 'react-hook-form';
 
+import { TextField } from '@/components/TextField';
 import { API_BASE_URL } from '@/config';
 import { useSession } from '@/store/session';
-
-import { TextField } from '../components/TextField';
 
 type UserCredentials = {
   username: string;

@@ -3,11 +3,10 @@
 import { Sprite, Stage } from '@pixi/react';
 import { Texture } from 'pixi.js';
 
+import { EditorView } from '@/components/EditorView';
 import { clientOnly } from '@/hoc/clientOnly';
 import { useElementSize } from '@/hooks/useResizeObserver';
 import { useTheme } from '@/hooks/useTheme';
-
-import { EditorView } from './EditorView';
 
 export const EditorRoot = clientOnly(function EditorRoot() {
   const { ref, width, height } = useElementSize();

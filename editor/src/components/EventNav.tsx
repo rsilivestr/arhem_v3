@@ -8,7 +8,7 @@ import {
 import clsx from 'clsx';
 import { useState } from 'react';
 
-import { EventList } from './EventList';
+import { EventList } from '@/components/EventList';
 
 export function EventNav() {
   const [isOpen, setIsOpen] = useState(true);
