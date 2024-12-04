@@ -12,22 +12,22 @@ type WidenPrimitiveValues<O extends object> = {
 };
 
 const dark = {
-  bg: colors.slate[800],
+  bg: colors.cyan[950],
   cell: {
-    main: colors.slate[700],
-    hover: colors.slate[600],
-    icon: colors.slate[700],
+    main: colors.sky[900],
+    hover: colors.sky[800],
+    icon: colors.sky[900],
   },
 };
 
 type ThemeColors = WidenPrimitiveValues<typeof dark>;
 
 const light: ThemeColors = {
-  bg: colors.slate[100],
+  bg: colors.gray[100],
   cell: {
-    main: colors.slate[200],
-    hover: colors.slate[300],
-    icon: colors.slate[200],
+    main: colors.blue[200],
+    hover: colors.blue[300],
+    icon: colors.blue[200],
   },
 };
 
@@ -36,6 +36,7 @@ export function useTheme() {
 
   useEffect(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    setMode(prefersDark.matches ? 'dark' : 'light');
     const hanldeModeChange = (e: MediaQueryListEvent) => {
       setMode(e.matches ? 'dark' : 'light');
     };
