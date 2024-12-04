@@ -28,7 +28,7 @@ export function EventList({ filter }: Props) {
     queryKey: ['events'],
     queryFn: async () => {
       if (!token) {
-        throw new Error('Нет токена');
+        throw new Error('Залогиньтесь');
       }
       return await ky
         .get<EventsRespose>(`${API_BASE_URL}/events`, {

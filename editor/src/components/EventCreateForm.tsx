@@ -4,6 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
 import { useForm } from 'react-hook-form';
 
+import { useSession } from '@/store/session';
+
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { TextField } from './TextField';
 
@@ -16,6 +18,7 @@ type EventCreateFields = {
 };
 
 export function EventCreateForm() {
+  const { token } = useSession();
   const { handleSubmit, register, reset } = useForm<EventCreateFields>();
   const queryClient = useQueryClient();
 
@@ -27,7 +30,11 @@ export function EventCreateForm() {
     mutate: createEvent,
   } = useMutation({
     async mutationFn(data: EventCreateFields) {
+      if (!token) {
+        throw new Error('Залогиньтесь');
+      }
       return await ky.post('/api/events', {
+        headers: { token },
         json: {
           ...data,
           id: cuid(),
