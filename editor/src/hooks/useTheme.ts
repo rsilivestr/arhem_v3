@@ -12,11 +12,11 @@ type WidenPrimitiveValues<O extends object> = {
 };
 
 const dark = {
-  bg: colors.slate[800],
+  bg: colors.cyan[950],
   cell: {
-    main: colors.slate[700],
-    hover: colors.slate[600],
-    icon: colors.slate[700],
+    main: colors.sky[900],
+    hover: colors.sky[800],
+    icon: colors.sky[900],
   },
 };
 
