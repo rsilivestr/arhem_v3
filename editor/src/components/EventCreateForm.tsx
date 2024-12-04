@@ -67,7 +67,7 @@ export function EventCreateForm() {
         {...register('max_rows', { valueAsNumber: true })}
       />
       <button
-        className="mt-5 h-8 flex items-center justify-center gap-2 dark:bg-green-800 dark:hover:bg-green-700"
+        className="mt-5 h-8 flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700"
         disabled={isPending}
         type="submit"
       >
