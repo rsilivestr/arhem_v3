@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS users_log_text(
+    id SERIAL PRIMARY KEY,
+    text TEXT NOT NULL UNIQUE
+);
