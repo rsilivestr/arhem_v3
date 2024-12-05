@@ -35,7 +35,7 @@ export function EventCreateForm() {
     isSuccess,
     mutate: createEvent,
   } = useMutation({
-    async mutationFn(data: EventCreateFields) {
+    mutationFn: async (data: EventCreateFields) => {
       if (!token) {
         throw new Error('Залогиньтесь');
       }
@@ -47,7 +47,7 @@ export function EventCreateForm() {
         },
       });
     },
-    onSuccess() {
+    onSuccess: () => {
       reset();
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
