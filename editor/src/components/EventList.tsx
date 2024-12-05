@@ -1,5 +1,7 @@
+import clsx from 'clsx';
 import Link from 'next/link';
 
+import { useEventDetails } from '@/hooks/useEventDetails';
 import { EventsRespose } from '@/types';
 
 import { SpinnerIcon } from './icons/SpinnerIcon';
@@ -9,16 +11,26 @@ type Props = {
 };
 
 export function EventList({ events }: Props) {
+  const { id: selectedEventId } = useEventDetails();
+
   return events ? (
     <ul className="overflow-auto">
       {events.map((evt) => (
         <li
           key={evt.id}
-          className="border-b border-slate-200 dark:border-slate-700"
+          className={clsx(
+            'border-b border-slate-200 dark:border-slate-700',
+            evt.id === selectedEventId && 'bg-slate-200 dark:bg-slate-750'
+          )}
         >
           <Link
             href={{ query: { event: evt.id } }}
-            className="px-4 py-2 flex flex-col hover:bg-slate-400 dark:hover:bg-slate-850"
+            className={clsx(
+              'px-4 py-2 flex flex-col border-l-4',
+              evt.id === selectedEventId
+                ? 'border-pink-900'
+                : 'border-transparent hover:bg-slate-250 dark:hover:bg-slate-850'
+            )}
           >
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               {evt.name}
