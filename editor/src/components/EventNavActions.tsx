@@ -18,6 +18,7 @@ type Props = {
 export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
   return (
     <div className="relative">
+      {/* TODO скрыть панель при клике на активную вкладку */}
       {open ? (
         <Tabs.Root>
           <Tabs.List className="relative flex w-full h-10 bg-slate-350 dark:bg-slate-800">
@@ -26,7 +27,7 @@ export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
                 value="create"
                 aria-label="Cоздать ивент"
                 title="Cоздать ивент"
-                className="data-[state=active]:bg-slate-300 hover:bg-slate-400 dark:data-[state=active]bg-slate-900 dark:hover:bg-slate-700"
+                className="data-[state=active]:bg-slate-300 hover:bg-slate-400 dark:data-[state=active]:bg-slate-900 dark:hover:bg-slate-700"
               >
                 <PlusIcon className="h-10 w-10 p-2" />
               </Tabs.Trigger>
@@ -34,7 +35,7 @@ export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
                 value="search"
                 aria-label="Найти ивенты"
                 title="Найти ивенты"
-                className="data-[state=active]:bg-slate-300 hover:bg-slate-400 dark:data-[state=active]bg-slate-900 dark:hover:bg-slate-700"
+                className="data-[state=active]:bg-slate-300 hover:bg-slate-400 dark:data-[state=active]:bg-slate-900 dark:hover:bg-slate-700"
               >
                 <MagnifyingGlassIcon className="h-10 w-10 p-2 " />
               </Tabs.Trigger>
@@ -54,6 +55,7 @@ export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
           </Tabs.Content>
           <Tabs.Content value="search" className="p-4">
             <TextField
+              // TODO автофокус при открытии вкладки поиска
               label="Искать по названию"
               onChange={(e) => onFilterChange(e.target.value)}
             />

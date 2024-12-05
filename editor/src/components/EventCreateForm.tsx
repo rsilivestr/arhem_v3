@@ -2,7 +2,7 @@ import cuid from '@bugsnag/cuid';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
-import { useForm } from 'react-hook-form';
+import { useForm, ValidationRule } from 'react-hook-form';
 
 import { useSession } from '@/store/session';
 
@@ -11,10 +11,16 @@ import { TextField } from './TextField';
 
 type EventCreateFields = {
   name: string;
+  code: string;
   description: string;
   image?: string;
   max_cols: number;
   max_rows: number;
+};
+
+const required: ValidationRule<boolean> = {
+  value: true,
+  message: 'Поле обязательно',
 };
 
 export function EventCreateForm() {
@@ -53,7 +59,8 @@ export function EventCreateForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
-      <TextField label="Название" {...register('name')} />
+      <TextField label="Название" {...register('name', { required })} />
+      <TextField label="Код" {...register('code', { required })} />
       <TextField label="Описание" {...register('description')} />
       <TextField
         label="Колонок в сетке"
