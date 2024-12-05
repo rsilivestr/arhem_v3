@@ -3,6 +3,8 @@ import dynamic from 'next/dynamic';
 import localFont from 'next/font/local';
 import Head from 'next/head';
 
+import { Providers } from '@/components/Providers';
+
 import './globals.css';
 
 const AppLayout = dynamic(() => import('@/components/AppLayout'), {
@@ -27,9 +29,11 @@ export default function ArhmEditr({ Component, pageProps }: AppProps) {
           font-family: ${firaCode.style.fontFamily};
         }
       `}</style>
-      <AppLayout>
-        <Component suppressHydrationWarning {...pageProps} />
-      </AppLayout>
+      <Providers>
+        <AppLayout>
+          <Component suppressHydrationWarning {...pageProps} />
+        </AppLayout>
+      </Providers>
     </>
   );
 }

@@ -18,7 +18,7 @@ export const SpinnerIcon = forwardRef<SVGSVGElement, SVGAttributes<SVGElement>>(
           r="10"
           stroke={color}
           opacity={0.5}
-          stroke-width="4"
+          strokeWidth="4"
         />
         <path
           fill={color}
