@@ -1,10 +1,18 @@
-use rocket::{get, serde::json::Json, State, response::status::Custom, http::Status};
+use rocket::{get, serde::json::Json, State, uri, response::Redirect};
 use sqlx::PgPool;
 use crate::models::Event;
-use crate::system::admin_token::AdminToken;
+use crate::system::admin_token::{AdminToken, ApiTokenError};
 
 #[get("/events")]
-pub async fn get_events(pool: &State<PgPool>, _user_id: AdminToken) -> Result<Json<Vec<Event>>, Custom<String>> {
+pub async fn get_events(pool: &State<PgPool>, user_id: Result<AdminToken, ApiTokenError>) -> Result<Json<Vec<Event>>, Redirect> {
+    match user_id {
+        Ok(_) => {},
+        Err(_) => {
+            Redirect::permanent(uri!("/editor/login"));
+            return Err(Redirect::permanent(uri!("/editor/login")))
+        }
+    };
+
     let query = r#"
         SELECT 
            e.id, e.name, e.code, e.description, e.image, e.max_cols, e.max_rows,
@@ -20,9 +28,7 @@ pub async fn get_events(pool: &State<PgPool>, _user_id: AdminToken) -> Result<Js
         .await
     {
         Ok(events) => events,
-        Err(e) => {
-            return Err(Custom(Status::InternalServerError, format!("Database error: {}", e),));
-        }
+        Err(_) => {return Err(Redirect::permanent(uri!("/editor/login")))}
     };
 
     Ok(Json(events))
