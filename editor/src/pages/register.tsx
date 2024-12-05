@@ -9,6 +9,9 @@ import { API_BASE_URL } from '@/config';
 type UserCredentials = {
   username: string;
   password: string;
+};
+
+type RegisterFields = UserCredentials & {
   passwordRepeat: string;
 };
 
@@ -41,13 +44,15 @@ export default function Register() {
     getValues,
     register,
     handleSubmit,
-  } = useForm<UserCredentials>();
+  } = useForm<RegisterFields>();
 
   return (
     <div className="h-full py-64 flex justify-center">
       <form
         className="w-[300px] flex flex-col gap-4"
-        onSubmit={handleSubmit((cred) => registerUser(cred))}
+        onSubmit={handleSubmit(({ username, password }) =>
+          registerUser({ username, password })
+        )}
       >
         <TextField
           label="Логин"

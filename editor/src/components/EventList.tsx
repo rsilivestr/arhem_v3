@@ -5,17 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { API_BASE_URL } from '@/config';
 import { useSession } from '@/store/session';
-
-type EventsRespose = Array<{
-  id: string;
-  name: string;
-  code: string;
-  description: string | null;
-  image: string | null;
-  date_create: string;
-  date_update: string;
-  user: string;
-}>;
+import { EventsRespose } from '@/types';
 
 type Props = {
   filter: string;
@@ -31,10 +21,10 @@ export function EventList({ filter }: Props) {
         throw new Error('Залогиньтесь');
       }
       return await ky
-        .get<EventsRespose>(`${API_BASE_URL}/events`, {
+        .get(`${API_BASE_URL}/events`, {
           headers: { token },
         })
-        .json();
+        .json<EventsRespose>();
     },
     enabled: !!token,
     retry(failureCount, error) {
