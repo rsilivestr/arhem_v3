@@ -2,8 +2,11 @@ use rocket::{
     request::{FromRequest, Outcome},
     http::Status,
     Request,
+    response::Redirect,
+    uri,
 };
 use sqlx::PgPool;
+
 
 #[derive(Debug)]
 pub struct AdminToken(pub String);
@@ -31,10 +34,18 @@ impl<'r> FromRequest<'r> for AdminToken {
                     .await
                 {
                     Ok(user_id) => Outcome::Success(AdminToken(user_id)),
-                    Err(_) => Outcome::Error((Status::Unauthorized, ApiTokenError::Invalid)),
+                    Err(_) => {
+                        let redirect = Redirect::to(uri!("editor/login"));
+                        req.local_cache(|| redirect);
+                        Outcome::Error((Status::Unauthorized, ApiTokenError::Invalid))
+                    }
                 }
             }
-            None => Outcome::Error((Status::Unauthorized, ApiTokenError::Missing)),
+            None => {
+                let redirect = Redirect::to(uri!("editor/login"));
+                req.local_cache(|| redirect);
+                Outcome::Error((Status::Unauthorized, ApiTokenError::Missing))
+            }
         }
     }
 }

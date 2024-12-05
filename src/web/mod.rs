@@ -4,8 +4,8 @@ mod editor;
 
 pub fn web_routes() -> Vec<rocket::Route> {
     routes![
-        editor::login,
-        editor::editor,
-        editor::register,
+        editor::editor_login,
+        editor::editor_page,
+        editor::editor_register,
     ]
 }
