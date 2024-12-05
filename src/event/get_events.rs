@@ -1,26 +1,18 @@
-use rocket::{get, serde::json::Json, State, uri, response::Redirect};
+use rocket::{get, serde::json::Json, State, response::status::Custom, http::Status};
 use sqlx::PgPool;
 use crate::models::Event;
-use crate::system::admin_token::{AdminToken, ApiTokenError};
+use crate::system::admin_token::AdminToken;
 
 #[get("/events")]
-pub async fn get_events(pool: &State<PgPool>, user_id: Result<AdminToken, ApiTokenError>) -> Result<Json<Vec<Event>>, Redirect> {
-    match user_id {
-        Ok(_) => {},
-        Err(_) => {
-            Redirect::permanent(uri!("/editor/login"));
-            return Err(Redirect::permanent(uri!("/editor/login")))
-        }
-    };
-
+pub async fn get_events(pool: &State<PgPool>, _user_guid: AdminToken) -> Result<Json<Vec<Event>>, Custom<String>> {
     let query = r#"
         SELECT 
-           e.id, e.name, e.code, e.description, e.image, e.max_cols, e.max_rows,
+           e.guid, e.name, e.description, e.image,
            to_char(e.date_create AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_create,
            to_char(e.date_update AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_update,
            u.username as user
         FROM events e
-        inner join users u on e.user_id = u.id;
+        inner join users u on e.user_guid = u.guid;
         "#;
 
     let events: Vec<Event> = match sqlx::query_as::<_, Event>(query)
@@ -28,7 +20,9 @@ pub async fn get_events(pool: &State<PgPool>, user_id: Result<AdminToken, ApiTok
         .await
     {
         Ok(events) => events,
-        Err(_) => {return Err(Redirect::permanent(uri!("/editor/login")))}
+        Err(e) => {
+            return Err(Custom(Status::InternalServerError, format!("Database error: {}", e),));
+        }
     };
 
     Ok(Json(events))
