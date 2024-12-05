@@ -2,14 +2,12 @@ use rocket::{get, serde::json::Json, State, response::status::Custom, http::Stat
 use rocket::serde::Serialize;
 use sqlx::{PgPool, query_as};
 
-use crate::models::{EventStep, EventLink};
+use crate::models::{Event, EventStep, EventLink};
 use crate::system::admin_token::AdminToken;
 
 #[derive(Serialize)]
 pub struct EventChema {
-    event_guid: String,
-    max_cols: i16,
-    max_rows: i16,
+    event: Event,
     steps: Vec<Step>
 }
 
@@ -21,13 +19,20 @@ pub struct Step {
 
 #[get("/event_shema/<event_id>")]
 pub async fn get_event_shema(pool: &State<PgPool>, event_id: String, _user_id: AdminToken) -> Result<Json<EventChema>, Custom<String>> {
-    let query = r#"SELECT max_cols, max_rows FROM events WHERE id = $1;"#;
-    let max:(i16, i16) = match query_as::<_, (i16, i16)>(query)
+    let query = r#"SELECT 
+            e.id, e.name, e.code, e.description, e.image, e.max_cols, e.max_rows,
+            to_char(e.date_create AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_create,
+            to_char(e.date_update AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_update,
+            u.username as user
+        FROM events e 
+        INNER JOIN users u ON e.user_id = u.id
+        WHERE e.id = $1;"#;
+    let event:Event = match query_as::<_, Event>(query)
         .bind(&event_id)
-        .fetch_all(pool.inner())
+        .fetch_one(pool.inner())
         .await
     {
-        Ok(max) => max[0],
+        Ok(event) => event,
         Err(e) => {
             return Err(Custom(Status::InternalServerError, format!("Не найден Event: {}", e)));
         }
@@ -35,14 +40,14 @@ pub async fn get_event_shema(pool: &State<PgPool>, event_id: String, _user_id: A
 
     let query = r#"
         SELECT
-            s.id, s.name, s.text, s.image, s.col, s.row
+            s.id, s.name, s.code, s.text, s.image, e.col, e.row,
             to_char(s.date_create AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_create,
             to_char(s.date_update AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_update,
             u.username as user
         FROM event_x_steps e 
         INNER JOIN event_steps s on e.step_id = s.id
-        INNER JOIN users u ON s.user_guid = u.id
-        WHERE s.event_id = $1;"#;
+        INNER JOIN users u ON s.user_id = u.id
+        WHERE e.event_id = $1;"#;
 
     let steps: Vec<EventStep> = match query_as::<_, EventStep>(query)
         .bind(&event_id)
@@ -88,9 +93,7 @@ pub async fn get_event_shema(pool: &State<PgPool>, event_id: String, _user_id: A
     }
 
     let event_chema = EventChema {
-        event_guid: event_id,
-        max_cols: max.0,
-        max_rows: max.1,
+        event,
         steps: steps_with_links,
     };
 
