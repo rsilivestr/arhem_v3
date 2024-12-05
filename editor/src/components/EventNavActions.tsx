@@ -18,9 +18,8 @@ type Props = {
 export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
   return (
     <div className="relative">
-      {/* TODO скрыть панель при клике на активную вкладку */}
       {open ? (
-        <Tabs.Root>
+        <Tabs.Root className="mb-6" defaultValue="search">
           <Tabs.List className="relative flex w-full h-10 bg-slate-350 dark:bg-slate-800">
             <>
               <Tabs.Trigger
@@ -55,7 +54,6 @@ export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
           </Tabs.Content>
           <Tabs.Content value="search" className="p-4">
             <TextField
-              // TODO автофокус при открытии вкладки поиска
               label="Искать по названию"
               onChange={(e) => onFilterChange(e.target.value)}
             />
