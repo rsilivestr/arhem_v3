@@ -9,7 +9,7 @@ import { useSession } from '@/store/session';
 type EventsRespose = Array<{
   id: string;
   name: string;
-  code_name: string;
+  code: string;
   description: string | null;
   image: string | null;
   date_create: string;
@@ -56,9 +56,9 @@ export function EventList({ filter }: Props) {
       setFilteredEvents(
         term.length > 0
           ? events.filter(
-              ({ name, code_name }) =>
+              ({ name, code }) =>
                 name.toLocaleLowerCase().includes(term) ||
-                code_name.toLocaleLowerCase().includes(term)
+                code?.toLocaleLowerCase().includes(term)
             )
           : events
       );
@@ -80,13 +80,13 @@ export function EventList({ filter }: Props) {
               query: { event: evt.id },
               slashes: true,
             }}
-            className="px-4 py-2 flex flex-col hover:bg-slate-400 dark:hover:bg-slate-800"
+            className="px-4 py-2 flex flex-col hover:bg-slate-400 dark:hover:bg-slate-850"
           >
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               {evt.name}
             </span>
             <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-              {evt.code_name}
+              {evt.code ?? '\xa0'}
             </span>
           </Link>
         </li>
