@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS events (
     id VARCHAR(25) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    code VARCHAR(255) NOT NULL,
     description TEXT NULL,
     image VARCHAR(255) NULL,
     max_cols SMALLINT,

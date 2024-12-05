@@ -8,7 +8,7 @@ use crate::system::admin_token::AdminToken;
 pub async fn get_event_steps(pool: &State<PgPool>, event_id: Json<EventId>, _user_guid: AdminToken) -> Result<Json<Vec<EventStep>>, Custom<String>> {
     let query = r#"
         SELECT
-            s.id, s.name, s.text, s.image, s.col, s.row,
+            s.id, s.name, s.code, s.text, s.image, s.col, s.row,
             to_char(s.date_create AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_create,
             to_char(s.date_update AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD HH24:MI:SS') as date_update,
             u.username as user

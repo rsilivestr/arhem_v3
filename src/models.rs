@@ -30,6 +30,7 @@ pub struct LoginResponse {
 pub struct NewEvent {
     pub id: String,
     pub name: String,
+    pub code: String,
     pub description: Option<String>,
     pub image: Option<String>,
     pub max_cols: i16,
@@ -40,6 +41,7 @@ pub struct NewEvent {
 pub struct Event {
     pub id: String,
     pub name: String,
+    pub code: String,
     pub description: Option<String>,
     pub image: Option<String>,
     pub max_cols: i16,
@@ -62,6 +64,7 @@ pub struct NewEventStep {
     pub col: i16,
     pub row: i16,
     pub name: String,
+    pub code: String,
     pub text: String,
     pub image: Option<String>,
 }
@@ -70,6 +73,7 @@ pub struct NewEventStep {
 pub struct EventStep {
     pub id: String,
     pub name: String,
+    pub code: String,
     pub text: String,
     pub image: Option<String>,
     pub col: i16,

@@ -1,7 +1,6 @@
 use rocket::{post, serde::json::Json, serde::Serialize, State, response::status::Custom, http::Status};
 use sqlx::{PgPool, query_as, query};
 use chrono::Utc;
-use cuid;
 
 use crate::models::NewEventStep;
 use crate::system::admin_token::AdminToken;
@@ -28,14 +27,15 @@ pub async fn create_event_step(pool: &State<PgPool>, event_step: Json<NewEventSt
     let query_ = r#"SELECT
     EXISTS (SELECT 1 FROM event_steps WHERE id = $1) AS id_match,
     EXISTS (SELECT 1 FROM event_steps
-        WHERE id = $1 AND name = $2 AND text = $3 AND image = $4
+        WHERE id = $1 AND name = $2 AND code = $3 AND text = $4 AND image = $5
     ) AS full_match,
-    EXISTS (SELECT 1 FROM event_x_steps where event_id = $5 and step_id = $1) as this_event,
-    EXISTS (SELECT 1 FROM event_x_steps where event_id != $5 and step_id = $1) as else_event;"#;
+    EXISTS (SELECT 1 FROM event_x_steps where event_id = $6 and step_id = $1) as this_event,
+    EXISTS (SELECT 1 FROM event_x_steps where event_id != $6 and step_id = $1) as else_event;"#;
     // (наличие step, полное совпадение step, наличие связки с диалогом, с другим диалогом )
     let message: String = match query_as::<_, (bool, bool, bool, bool)> (query_)
         .bind(&new_event.id)
         .bind(&new_event.name)
+        .bind(&new_event.code)
         .bind(&new_event.text)
         .bind(&new_event.image)
         .bind(&new_event.event_id)
@@ -98,9 +98,9 @@ async fn update_event_x_steps(pool: &PgPool, new_event: &NewEventStep, new_step_
     query(r#"UPDATE event_x_steps 
         set start = $1, row = $2, col = $3
         where event_id = $4 and step_id = $5;"#)
-        .bind(&new_event.start)
-        .bind(&new_event.row)
-        .bind(&new_event.col)
+        .bind(new_event.start)
+        .bind(new_event.row)
+        .bind(new_event.col)
         .bind(&new_event.event_id)
         .bind(new_step_id)
         .execute(pool)
@@ -114,9 +114,9 @@ async fn insert_event_x_steps(pool: &PgPool, new_event: &NewEventStep) -> Result
     query(r#"INSERT INTO event_x_steps VALUES($1, $2, $3, $4, $5);"#)
         .bind(&new_event.event_id)
         .bind(&new_event.id)
-        .bind(&new_event.start)
-        .bind(&new_event.row)
-        .bind(&new_event.col)
+        .bind(new_event.start)
+        .bind(new_event.row)
+        .bind(new_event.col)
         .execute(pool)
         .await
         .map_err(|e| Custom(Status::InternalServerError, format!("Database error: {}", e)))?;
@@ -126,9 +126,10 @@ async fn insert_event_x_steps(pool: &PgPool, new_event: &NewEventStep) -> Result
 
 async fn insert_event_steps(pool: &PgPool, new_event: &NewEventStep, user_id: &str, new_step_id: &str) -> Result<(), Custom<String>> {
     let now = Utc::now();
-    query(r#"INSERT INTO event_steps VALUES($1, $2, $3, $4, $5, $5, $6);"#)
-        .bind(&new_step_id)
+    query(r#"INSERT INTO event_steps VALUES($1, $2, $3, $4, $5, $6, $6, $7);"#)
+        .bind(new_step_id)
         .bind(&new_event.name)
+        .bind(&new_event.code)
         .bind(&new_event.text)
         .bind(&new_event.image)
         .bind(now)
@@ -143,10 +144,11 @@ async fn insert_event_steps(pool: &PgPool, new_event: &NewEventStep, user_id: &s
 async fn update_event_steps(pool: &PgPool, new_event: &NewEventStep, user_id: &str) -> Result<(), Custom<String>> {
     let now = Utc::now();
     query(r#"UPDATE event_steps 
-            set name = $2, text = $3, image = $4, date_update = $5, user_id = $6
+            set name = $2, code= $3, text = $4, image = $5, date_update = $6, user_id = $7
             WHERE id = $1;"#)
         .bind(&new_event.id)
         .bind(&new_event.name)
+        .bind(&new_event.code)
         .bind(&new_event.text)
         .bind(&new_event.image)
         .bind(now)

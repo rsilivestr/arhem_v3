@@ -15,26 +15,28 @@ pub async fn create_event(pool: &State<PgPool>, event: Json<NewEvent>, user_id: 
     let query = r#"
             WITH inserted AS (
                 INSERT INTO events (
-                    id, name, description, image, max_cols, max_rows,
+                    id, name, code, description, image, max_cols, max_rows,
                     date_create, date_update, user_id
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8, $9)
                 ON CONFLICT (id)
                 DO UPDATE
                     SET name = EXCLUDED.name,
+                        code = EXCLUDED.code,
                         description = EXCLUDED.description,
                         image = EXCLUDED.image,
                         max_cols = EXCLUDED.max_cols,
                         max_rows = EXCLUDED.max_rows,
                         date_update = EXCLUDED.date_update,
                         user_id = EXCLUDED.user_id
-                RETURNING id, name, description, image,
+                RETURNING id, name, code, description, image,
                     max_cols, max_rows,
                     date_create, date_update, user_id
             )
             SELECT 
                 i.id, 
-                i.name, 
+                i.name,
+                i.code,
                 i.description, 
                 i.image,
                 i.max_cols,
@@ -48,6 +50,7 @@ pub async fn create_event(pool: &State<PgPool>, event: Json<NewEvent>, user_id: 
     let inserted_event: Event = match sqlx::query_as::<_, Event>(query)
         .bind(&new_event.id)
         .bind(&new_event.name)
+        .bind(&new_event.code)
         .bind(&new_event.description)
         .bind(&new_event.image)
         .bind(new_event.max_cols)
