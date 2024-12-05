@@ -15,3 +15,10 @@ export type EventMeta = {
 };
 
 export type EventsRespose = Array<EventData & EventMeta>;
+
+export type EventStep = unknown; // TODO
+
+export type EventDetailsResponse = {
+  event: EventData & EventMeta;
+  steps: EventStep[];
+};
