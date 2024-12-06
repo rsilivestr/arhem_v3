@@ -5,18 +5,12 @@ import ky from 'ky';
 import { useForm, ValidationRule } from 'react-hook-form';
 
 import { useSession } from '@/store/session';
+import { EventData } from '@/types';
 
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { TextField } from './TextField';
 
-type EventCreateFields = {
-  name: string;
-  code: string;
-  description: string;
-  image?: string;
-  max_cols: number;
-  max_rows: number;
-};
+type EventCreateFields = Omit<EventData, 'id'>;
 
 const required: ValidationRule<boolean> = {
   value: true,
@@ -53,8 +47,8 @@ export function EventCreateForm() {
     },
   });
 
-  const onSubmit = handleSubmit((json) => {
-    createEvent(json);
+  const onSubmit = handleSubmit((data) => {
+    createEvent(data);
   });
 
   return (

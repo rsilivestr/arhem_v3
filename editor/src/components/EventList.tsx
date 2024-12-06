@@ -1,86 +1,36 @@
-import { useQuery } from '@tanstack/react-query';
-import ky, { HTTPError } from 'ky';
+import clsx from 'clsx';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-import { API_BASE_URL } from '@/config';
-import { useSession } from '@/store/session';
+import { useEventDetails } from '@/hooks/useEventDetails';
+import { EventsRespose } from '@/types';
 
-type EventsRespose = Array<{
-  id: string;
-  name: string;
-  code: string;
-  description: string | null;
-  image: string | null;
-  date_create: string;
-  date_update: string;
-  user: string;
-}>;
+import { SpinnerIcon } from './icons/SpinnerIcon';
 
 type Props = {
-  filter: string;
+  events?: EventsRespose;
 };
 
-export function EventList({ filter }: Props) {
-  const { token } = useSession();
+export function EventList({ events }: Props) {
+  const { id: selectedEventId } = useEventDetails();
 
-  const { data: events } = useQuery({
-    queryKey: ['events'],
-    queryFn: async () => {
-      if (!token) {
-        throw new Error('Залогиньтесь');
-      }
-      return await ky
-        .get<EventsRespose>(`${API_BASE_URL}/events`, {
-          headers: { token },
-        })
-        .json();
-    },
-    enabled: !!token,
-    retry(failureCount, error) {
-      return (
-        failureCount < 6 &&
-        !(error instanceof HTTPError && error.response.status === 401)
-      );
-    },
-  });
-
-  const [filteredEvents, setFilteredEvents] = useState(events || []);
-
-  useEffect(() => {
-    if (!events) {
-      return;
-    }
-    const tid = setTimeout(() => {
-      const term = filter.trim().toLocaleLowerCase();
-      setFilteredEvents(
-        term.length > 0
-          ? events.filter(
-              ({ name, code }) =>
-                name.toLocaleLowerCase().includes(term) ||
-                code?.toLocaleLowerCase().includes(term)
-            )
-          : events
-      );
-    }, 300);
-    return () => {
-      clearTimeout(tid);
-    };
-  }, [events, filter]);
-
-  return (
+  return events ? (
     <ul className="overflow-auto">
-      {filteredEvents?.map((evt) => (
+      {events.map((evt) => (
         <li
           key={evt.id}
-          className="border-b border-slate-200 dark:border-slate-700"
+          className={clsx(
+            'border-b border-slate-200 dark:border-slate-700',
+            evt.id === selectedEventId && 'bg-slate-200 dark:bg-slate-750'
+          )}
         >
           <Link
-            href={{
-              query: { event: evt.id },
-              slashes: true,
-            }}
-            className="px-4 py-2 flex flex-col hover:bg-slate-400 dark:hover:bg-slate-850"
+            href={{ query: { event: evt.id } }}
+            className={clsx(
+              'px-4 py-2 flex flex-col border-l-4',
+              evt.id === selectedEventId
+                ? 'border-pink-900'
+                : 'border-transparent hover:bg-slate-250 dark:hover:bg-slate-850'
+            )}
           >
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               {evt.name}
@@ -92,5 +42,9 @@ export function EventList({ filter }: Props) {
         </li>
       ))}
     </ul>
+  ) : (
+    <div className="w-full p-8 text-center">
+      <SpinnerIcon className="inline w-8 h-8 animate-spin" />
+    </div>
   );
 }

@@ -5,6 +5,7 @@ import {
   PlusIcon,
 } from '@radix-ui/react-icons';
 import * as Tabs from '@radix-ui/react-tabs';
+import { useState } from 'react';
 
 import { EventCreateForm } from './EventCreateForm';
 import { TextField } from './TextField';
@@ -16,18 +17,33 @@ type Props = {
 };
 
 export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
+  const [tab, setTab] = useState('none');
+
+  const handleTabPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.currentTarget.dataset.state === 'active') {
+      // Prevent tab re-activation
+      e.preventDefault();
+      setTab('none');
+    }
+  };
+
   return (
     <div className="relative">
-      {/* TODO скрыть панель при клике на активную вкладку */}
       {open ? (
-        <Tabs.Root>
+        <Tabs.Root
+          className="mb-6"
+          defaultValue="none"
+          value={tab}
+          onValueChange={setTab}
+        >
           <Tabs.List className="relative flex w-full h-10 bg-slate-350 dark:bg-slate-800">
             <>
               <Tabs.Trigger
                 value="create"
-                aria-label="Cоздать ивент"
-                title="Cоздать ивент"
+                aria-label="Создать ивент"
+                title="Создать ивент"
                 className="data-[state=active]:bg-slate-300 hover:bg-slate-400 dark:data-[state=active]:bg-slate-900 dark:hover:bg-slate-700"
+                onPointerDown={handleTabPointerDown}
               >
                 <PlusIcon className="h-10 w-10 p-2" />
               </Tabs.Trigger>
@@ -36,6 +52,7 @@ export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
                 aria-label="Найти ивенты"
                 title="Найти ивенты"
                 className="data-[state=active]:bg-slate-300 hover:bg-slate-400 dark:data-[state=active]:bg-slate-900 dark:hover:bg-slate-700"
+                onPointerDown={handleTabPointerDown}
               >
                 <MagnifyingGlassIcon className="h-10 w-10 p-2 " />
               </Tabs.Trigger>
@@ -55,7 +72,6 @@ export function EventNavActions({ open, onOpenChange, onFilterChange }: Props) {
           </Tabs.Content>
           <Tabs.Content value="search" className="p-4">
             <TextField
-              // TODO автофокус при открытии вкладки поиска
               label="Искать по названию"
               onChange={(e) => onFilterChange(e.target.value)}
             />

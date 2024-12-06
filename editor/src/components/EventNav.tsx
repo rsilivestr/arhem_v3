@@ -2,12 +2,14 @@ import clsx from 'clsx';
 import { useState } from 'react';
 
 import { EventList } from '@/components/EventList';
+import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 
 import { EventNavActions } from './EventNavActions';
 
 export function EventNav() {
   const [isOpen, setIsOpen] = useState(true);
-  const [filterTerm, setFilterTerm] = useState('');
+
+  const { events, setFilterTerm } = useFilteredEvents();
 
   return (
     <aside
@@ -21,7 +23,7 @@ export function EventNav() {
         onOpenChange={setIsOpen}
         onFilterChange={setFilterTerm}
       />
-      <EventList filter={filterTerm} />
+      <EventList events={events} />
     </aside>
   );
 }
