@@ -31,12 +31,19 @@ export function useViewportTransform() {
     if (!stage) {
       return;
     }
-    const handleWheel = ({ deltaY, shiftKey }: FederatedWheelEvent) => {
-      const dirMod = deltaY > 0 ? -1 : 1;
+    const handleWheel = ({ deltaX, deltaY, shiftKey }: FederatedWheelEvent) => {
+      const dirModX = deltaX > 0 ? -1 : 1;
+      const dirModY = deltaY > 0 ? -1 : 1;
       if (shiftKey) {
-        translate((EDITOR_CELL_WIDTH / 2) * dirMod, 0);
+        translate(
+          (EDITOR_CELL_WIDTH / 2) * dirModY,
+          (EDITOR_CELL_WIDTH / 2) * dirModX
+        );
       } else {
-        translate(0, (EDITOR_CELL_HEIGHT / 2) * dirMod);
+        translate(
+          (EDITOR_CELL_WIDTH / 2) * dirModX,
+          (EDITOR_CELL_HEIGHT / 2) * dirModY
+        );
       }
     };
     stage.on('wheel', handleWheel);
