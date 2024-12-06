@@ -13,7 +13,7 @@ export function useFilteredEvents() {
     queryKey: ['events'],
     queryFn: async () => {
       if (!token) {
-        throw new Error('Залогиньтесь');
+        return;
       }
       return await ky
         .get(`${API_BASE_URL}/events`, {
