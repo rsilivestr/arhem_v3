@@ -9,7 +9,7 @@ import { EventNavActions } from './EventNavActions';
 export function EventNav() {
   const [isOpen, setIsOpen] = useState(true);
 
-  const { events, setFilterTerm } = useFilteredEvents();
+  const { events, filterTerm, setFilterTerm } = useFilteredEvents();
 
   return (
     <aside
@@ -21,6 +21,7 @@ export function EventNav() {
       <EventNavActions
         open={isOpen}
         onOpenChange={setIsOpen}
+        filterTerm={filterTerm}
         onFilterChange={setFilterTerm}
       />
       <EventList events={events} />

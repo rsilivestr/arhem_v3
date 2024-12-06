@@ -50,6 +50,7 @@ export function useFilteredEvents() {
 
   return {
     events: filteredEvents,
+    filterTerm,
     setFilterTerm,
   };
 }
