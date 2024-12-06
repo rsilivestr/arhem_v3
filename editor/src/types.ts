@@ -14,11 +14,13 @@ export type EventMeta = {
   user: string;
 };
 
-export type EventsRespose = Array<EventData & EventMeta>;
+export type GameEvent = EventData & EventMeta;
+
+export type EventsRespose = Array<GameEvent>;
 
 export type EventStep = unknown; // TODO
 
 export type EventDetailsResponse = {
-  event: EventData & EventMeta;
+  event: GameEvent;
   steps: EventStep[];
 };

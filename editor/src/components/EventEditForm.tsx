@@ -1,26 +1,32 @@
-import cuid from '@bugsnag/cuid';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
+import { useEffect } from 'react';
 import { useForm, ValidationRule } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
 import { useSession } from '@/store/session';
-import { EventData } from '@/types';
+import { EventData, GameEvent } from '@/types';
 
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { TextField } from './TextField';
 
-type EventCreateFields = Omit<EventData, 'id'>;
+type EventEditFields = EventData;
+
+type Props = {
+  event: GameEvent;
+};
 
 const required: ValidationRule<boolean> = {
   value: true,
   message: 'Поле обязательно',
 };
 
-export function EventCreateForm() {
+export function EventEditForm({ event }: Props) {
   const { token } = useSession();
-  const { handleSubmit, register, reset } = useForm<EventCreateFields>();
+  const { handleSubmit, register, setValue } = useForm<EventEditFields>({
+    defaultValues: { ...event },
+  });
   const queryClient = useQueryClient();
 
   const {
@@ -30,23 +36,31 @@ export function EventCreateForm() {
     isSuccess,
     mutate: createEvent,
   } = useMutation({
-    mutationFn: async (data: EventCreateFields) => {
+    mutationFn: async (data: EventEditFields) => {
       if (!token) {
         throw new Error('Залогиньтесь');
       }
       return await ky.post(`${API_BASE_URL}/events`, {
         headers: { token },
-        json: {
-          ...data,
-          id: cuid(),
-        },
+        json: { ...data },
       });
     },
     onSuccess: () => {
-      reset();
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
   });
+
+  useEffect(() => {
+    if (!event) {
+      return;
+    }
+    setValue('id', event.id);
+    setValue('name', event.name);
+    setValue('code', event.code);
+    setValue('description', event.description);
+    setValue('max_cols', event.max_cols);
+    setValue('max_rows', event.max_rows);
+  }, [event, setValue]);
 
   const onSubmit = handleSubmit((data) => {
     createEvent(data);
@@ -54,6 +68,7 @@ export function EventCreateForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
+      <TextField label="Id" readOnly {...register('id', { required })} />
       <TextField label="Название" {...register('name', { required })} />
       <TextField label="Код" {...register('code', { required })} />
       <TextField label="Описание" {...register('description')} />
@@ -84,9 +99,10 @@ export function EventCreateForm() {
           <SpinnerIcon className="inline animate-spin" />
         ) : (
           <>
+            {/* TODO Hide status icon after a timeout */}
             {isSuccess && <CheckIcon className="w-5 h-5" />}
             {isError && <Cross2Icon className="w-5 h-5" />}
-            <span>Создать</span>
+            <span>Сохранить</span>
           </>
         )}
       </button>
