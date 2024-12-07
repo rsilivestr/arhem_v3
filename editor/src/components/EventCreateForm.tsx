@@ -9,6 +9,7 @@ import { useSession } from '@/store/session';
 import { EventData } from '@/types';
 
 import { SpinnerIcon } from './icons/SpinnerIcon';
+import { TextareaField } from './TextareaField';
 import { TextField } from './TextField';
 
 type EventCreateFields = Omit<EventData, 'id'>;
@@ -56,27 +57,31 @@ export function EventCreateForm() {
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
       <TextField label="Название" {...register('name', { required })} />
       <TextField label="Код" {...register('code', { required })} />
-      <TextField label="Описание" {...register('description')} />
-      <TextField
-        label="Колонок в сетке"
-        type="number"
-        step={1}
-        min={1}
-        max={999}
-        defaultValue={5}
-        {...register('max_cols', { valueAsNumber: true })}
-      />
-      <TextField
-        label="Строк в сетке"
-        type="number"
-        step={1}
-        min={1}
-        max={999}
-        defaultValue={5}
-        {...register('max_rows', { valueAsNumber: true })}
-      />
+      <TextareaField label="Описание" {...register('description')} />
+      <div className="flex gap-2">
+        <TextField
+          className="grow"
+          label="Колонок"
+          type="number"
+          step={1}
+          min={1}
+          max={999}
+          defaultValue={5}
+          {...register('max_cols', { valueAsNumber: true })}
+        />
+        <TextField
+          className="grow"
+          label="Строк"
+          type="number"
+          step={1}
+          min={1}
+          max={999}
+          defaultValue={5}
+          {...register('max_rows', { valueAsNumber: true })}
+        />
+      </div>
       <button
-        className="mt-5 h-8 flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700"
+        className="h-8 flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700"
         disabled={isPending}
         type="submit"
       >

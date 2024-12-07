@@ -44,12 +44,7 @@ export function EventNavActions({
   return (
     <div className="relative">
       {open ? (
-        <Tabs.Root
-          className="mb-6"
-          defaultValue="none"
-          value={tab}
-          onValueChange={setTab}
-        >
+        <Tabs.Root defaultValue="none" value={tab} onValueChange={setTab}>
           <Tabs.List className="relative flex w-full h-10 bg-slate-350 dark:bg-slate-800">
             <>
               <Tabs.Trigger
