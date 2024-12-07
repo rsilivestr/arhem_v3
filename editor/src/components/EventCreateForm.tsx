@@ -1,5 +1,5 @@
 import cuid from '@bugsnag/cuid';
-import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
+import { CheckIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
 import { useForm, ValidationRule } from 'react-hook-form';
@@ -27,6 +27,7 @@ export function EventCreateForm() {
   const {
     error,
     isError,
+    isIdle,
     isPending,
     isSuccess,
     mutate: createEvent,
@@ -79,22 +80,20 @@ export function EventCreateForm() {
           defaultValue={5}
           {...register('max_rows', { valueAsNumber: true })}
         />
-      </div>
-      <button
-        className="h-8 flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700"
-        disabled={isPending}
-        type="submit"
-      >
-        {isPending ? (
-          <SpinnerIcon className="inline animate-spin" />
-        ) : (
-          <>
+        <button
+          className="h-8 pl-8 pr-2 self-end relative flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700"
+          disabled={isPending}
+          type="submit"
+        >
+          <span className="absolute left-2">
+            {isIdle && <PlusIcon className="w-5 h-5" />}
+            {isPending && <SpinnerIcon className="w-5 h-5 animate-spin" />}
             {isSuccess && <CheckIcon className="w-5 h-5" />}
             {isError && <Cross2Icon className="w-5 h-5" />}
-            <span>Создать</span>
-          </>
-        )}
-      </button>
+          </span>
+          <span>Создать</span>
+        </button>
+      </div>
       {isError && (
         <p className="max-w-[368px] text-sm mt-5 text-red-500">
           {error.message}
