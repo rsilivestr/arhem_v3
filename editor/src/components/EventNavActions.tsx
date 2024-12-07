@@ -31,6 +31,9 @@ export function EventNavActions({
   const [tab, setTab] = useState('none');
 
   const handleTabPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.currentTarget.disabled) {
+      e.preventDefault();
+    }
     if (e.currentTarget.dataset.state === 'active') {
       // Prevent tab re-activation
       e.preventDefault();
