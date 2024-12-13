@@ -2,9 +2,10 @@ import cuid from '@bugsnag/cuid';
 import { CheckIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
-import { useForm, ValidationRule } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
+import { required } from '@/constants';
 import { useSession } from '@/store/session';
 import { EventData } from '@/types';
 
@@ -13,11 +14,6 @@ import { TextareaField } from './TextareaField';
 import { TextField } from './TextField';
 
 type EventCreateFields = Omit<EventData, 'id'>;
-
-const required: ValidationRule<boolean> = {
-  value: true,
-  message: 'Поле обязательно',
-};
 
 export function EventCreateForm() {
   const { token } = useSession();

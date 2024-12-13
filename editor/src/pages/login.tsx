@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import ky from 'ky';
 import { useRouter } from 'next/navigation';
-import { useForm, ValidationRule } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { TextField } from '@/components/TextField';
 import { API_BASE_URL } from '@/config';
+import { required } from '@/constants';
 import { useSession } from '@/store/session';
 
 type UserCredentials = {
@@ -15,11 +16,6 @@ type UserCredentials = {
 type UserLoginResponse = {
   token: string;
   message: string;
-};
-
-const required: ValidationRule<boolean> = {
-  value: true,
-  message: 'Поле обязательно',
 };
 
 export default function Login() {

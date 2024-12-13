@@ -2,9 +2,10 @@ import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
 import { useEffect } from 'react';
-import { useForm, ValidationRule } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
+import { required } from '@/constants';
 import { useSession } from '@/store/session';
 import { EventData, GameEvent } from '@/types';
 
@@ -17,11 +18,6 @@ type EventEditFields = Omit<EventData, 'id'>;
 
 type Props = {
   event: GameEvent;
-};
-
-const required: ValidationRule<boolean> = {
-  value: true,
-  message: 'Поле обязательно',
 };
 
 export function EventEditForm({ event }: Props) {
