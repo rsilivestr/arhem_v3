@@ -24,3 +24,23 @@ export type EventDetailsResponse = {
   event: GameEvent;
   steps: EventStep[];
 };
+
+export type StepData = {
+  id: string;
+  event_id: string;
+  name: string;
+  code: string;
+  text: string;
+  image: string | null;
+  start: boolean;
+  col: number;
+  row: number;
+};
+
+export type StepMeta = {
+  date_create: string;
+  date_update: string;
+  user: string;
+};
+
+export type GameStep = StepData & StepMeta;
