@@ -17,11 +17,16 @@ const ICON_LEFT = (EDITOR_CELL_WIDTH - ICON_SIZE) / 2;
 type Props = {
   x: number;
   y: number;
+  // TODO set url search params
+  col: number;
+  row: number;
 };
 
 export function EditorGridCell({ x, y }: Props) {
-  const [isHovered, setIsHovered] = useState(false);
   const { colors } = useTheme();
+  const [isHovered, setIsHovered] = useState(false);
+
+  console.log('render');
 
   return (
     <Container x={x} y={y}>

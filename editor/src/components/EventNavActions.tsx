@@ -10,6 +10,7 @@ import { useEventDetails } from '@/hooks/useEventDetails';
 
 import { EventCreateForm } from './EventCreateForm';
 import { EventEditForm } from './EventEditForm';
+import { StepCreateForm } from './StepCreateForm';
 import { TextField } from './TextField';
 
 type Props = {
@@ -31,6 +32,8 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
       setTab('none');
     }
   };
+
+  // TODO reset tab on redirect from event
 
   return (
     <Tabs.Root defaultValue="none" value={tab} onValueChange={setTab}>
@@ -67,6 +70,16 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
         >
           <Pencil1Icon className="h-10 w-10 p-2 " />
         </Tabs.Trigger>
+        <Tabs.Trigger
+          disabled={!event}
+          value="step-create"
+          aria-label="Создать шаг"
+          title="Создать шаг"
+          className="data-[state=active]:bg-slate-300 enabled:hover:bg-slate-400 dark:data-[state=active]:bg-slate-900 enabled:dark:hover:bg-slate-700 disabled:cursor-not-allowed"
+          onPointerDown={handleTabPointerDown}
+        >
+          <PlusIcon className="h-10 w-10 p-2" />
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="event-create" className="p-4">
         <EventCreateForm />
@@ -80,6 +93,9 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
           value={filterTerm}
           onChange={(e) => onFilterChange(e.target.value)}
         />
+      </Tabs.Content>
+      <Tabs.Content value="step-create" className="p-4">
+        <StepCreateForm />
       </Tabs.Content>
     </Tabs.Root>
   );

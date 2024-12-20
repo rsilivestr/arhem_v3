@@ -1,0 +1,102 @@
+import cuid from '@bugsnag/cuid';
+import { CheckIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
+import { useMutation } from '@tanstack/react-query';
+import ky from 'ky';
+import { useForm } from 'react-hook-form';
+
+import { API_BASE_URL } from '@/config';
+import { required } from '@/constants';
+import { useEventDetails } from '@/hooks/useEventDetails';
+import { useSession } from '@/store/session';
+import { StepData } from '@/types';
+
+import { SpinnerIcon } from './icons/SpinnerIcon';
+import { TextareaField } from './TextareaField';
+import { TextField } from './TextField';
+
+type StepCreateFields = Omit<StepData, 'id' | 'event_id' | 'image'>;
+
+export function StepCreateForm() {
+  const { event } = useEventDetails();
+  const { token } = useSession();
+
+  const { handleSubmit, register } = useForm<StepCreateFields>();
+  const {
+    isError,
+    isIdle,
+    isPending,
+    isSuccess,
+    mutate: createStep,
+  } = useMutation({
+    mutationFn: async (data: StepCreateFields) => {
+      if (!token) {
+        throw new Error('Залогиньтесь');
+      }
+      if (!event) {
+        throw new Error('Нельзя создать шаг без ивента');
+      }
+      return await ky.post(`${API_BASE_URL}/event_step`, {
+        headers: { token },
+        json: {
+          id: cuid(),
+          event_id: event.id,
+          image: null,
+          ...data,
+        },
+      });
+    },
+    onSuccess: () => {
+      // TODO
+      // invalidate steps?
+      // switch to step edit form
+      // add step to url query params
+    },
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    createStep(data);
+  });
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
+      <TextField label="Название" {...register('name', { required })} />
+      <TextField label="Код" {...register('code', { required })} />
+      <TextareaField label="Текст" {...register('text')} />
+      <div className="flex gap-2">
+        <TextField
+          className="grow"
+          label="Колонка"
+          type="number"
+          step={1}
+          min={1}
+          max={999}
+          defaultValue={1}
+          {...register('col', { valueAsNumber: true })}
+        />
+        <TextField
+          className="grow"
+          label="Строка"
+          type="number"
+          step={1}
+          min={1}
+          max={999}
+          defaultValue={1}
+          {...register('row', { valueAsNumber: true })}
+        />
+        <button
+          className="h-8 pl-8 pr-2 self-end relative flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700"
+          disabled={isPending}
+          type="submit"
+        >
+          <span className="absolute left-2">
+            {isIdle && <PlusIcon className="w-5 h-5" />}
+            {isPending && <SpinnerIcon className="w-5 h-5 animate-spin" />}
+            {isSuccess && <CheckIcon className="w-5 h-5" />}
+            {isError && <Cross2Icon className="w-5 h-5" />}
+          </span>
+          <span>Создать</span>
+        </button>
+      </div>
+    </form>
+  );
+}

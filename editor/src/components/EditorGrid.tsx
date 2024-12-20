@@ -31,6 +31,8 @@ export function EditorGrid() {
             key={`${colIndex}/${rowIndex}`}
             x={colIndex * colOffset}
             y={rowIndex * rowOffset}
+            col={colIndex + 1}
+            row={rowIndex + 1}
           />
         );
       })}
