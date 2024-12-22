@@ -4,9 +4,10 @@ import {
   PlusIcon,
 } from '@radix-ui/react-icons';
 import * as Tabs from '@radix-ui/react-tabs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useEventDetails } from '@/hooks/useEventDetails';
+import { useEditorGrid } from '@/store/editor/grid';
 
 import { EventCreateForm } from './EventCreateForm';
 import { EventEditForm } from './EventEditForm';
@@ -20,6 +21,7 @@ type Props = {
 
 export function EventNavActions({ filterTerm, onFilterChange }: Props) {
   const { event } = useEventDetails();
+  const { activeCell } = useEditorGrid();
   const [tab, setTab] = useState('none');
 
   const handleTabPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -32,6 +34,12 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
       setTab('none');
     }
   };
+
+  useEffect(() => {
+    if (activeCell) {
+      setTab('step-create');
+    }
+  }, [activeCell]);
 
   // TODO reset tab on redirect from event
 
