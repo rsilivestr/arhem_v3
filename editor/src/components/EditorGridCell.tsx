@@ -7,6 +7,7 @@ import {
   EDITOR_CELL_WIDTH,
 } from '@/config';
 import { useTheme } from '@/hooks/useTheme';
+import { useEditorGrid } from '@/store/editor/grid';
 
 const ICON_SIZE = Math.ceil(EDITOR_CELL_HEIGHT / 2.5);
 const ICON_STROKE = Math.ceil(ICON_SIZE / 10);
@@ -22,9 +23,11 @@ type Props = {
   row: number;
 };
 
-export function EditorGridCell({ x, y }: Props) {
+export function EditorGridCell({ x, y, col, row }: Props) {
   const { colors } = useTheme();
+  const { activeCell, setActiveCell } = useEditorGrid();
   const [isHovered, setIsHovered] = useState(false);
+  const isSelected = col === activeCell?.col && row === activeCell?.row;
 
   return (
     <Container x={x} y={y}>
@@ -32,6 +35,9 @@ export function EditorGridCell({ x, y }: Props) {
         draw={(g) => {
           g.clear();
           g.beginFill(isHovered ? colors.cell.hover : colors.cell.main);
+          if (isSelected) {
+            g.lineStyle({ width: 3, color: colors.cell.border });
+          }
           g.drawRoundedRect(
             0,
             0,
@@ -44,6 +50,11 @@ export function EditorGridCell({ x, y }: Props) {
         cursor="pointer"
         onpointerenter={() => setIsHovered(true)}
         onpointerleave={() => setIsHovered(false)}
+        onclick={() => {
+          if (!isSelected) {
+            setActiveCell({ col, row });
+          }
+        }}
       />
       <Graphics
         x={ICON_LEFT}

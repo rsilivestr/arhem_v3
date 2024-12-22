@@ -1,27 +1,35 @@
 import { create } from 'zustand';
 
+type Cell = {
+  col: number;
+  row: number;
+};
+
 type EditorGrid = {
-  columns: number;
+  cols: number;
   rows: number;
   setSize(columns: number, rows: number): void;
-  addColumns(amount: number): void;
+  addCols(amount: number): void;
   addRows(count: number): void;
+
+  activeCell: Cell | null;
+  setActiveCell(cell: Cell | null): void;
 };
 
 const useEditorGrid = create<EditorGrid>((set) => ({
-  columns: 5,
+  cols: 5,
   rows: 5,
 
-  setSize(columns, rows) {
-    if (isValidSize(columns) && isValidSize(rows)) {
-      set({ columns, rows });
+  setSize(cols, rows) {
+    if (isValidSize(cols) && isValidSize(rows)) {
+      set({ cols, rows });
     }
   },
 
-  addColumns(amount) {
+  addCols(amount) {
     set((grid) => {
-      const columns = grid.columns + amount;
-      return isValidSize(columns) ? { ...grid, columns } : grid;
+      const cols = grid.cols + amount;
+      return isValidSize(cols) ? { ...grid, cols } : grid;
     });
   },
 
@@ -30,6 +38,12 @@ const useEditorGrid = create<EditorGrid>((set) => ({
       const rows = grid.rows + amount;
       return isValidSize(rows) ? { ...grid, rows } : grid;
     });
+  },
+
+  activeCell: null,
+
+  setActiveCell(activeCell) {
+    set({ activeCell });
   },
 }));
 

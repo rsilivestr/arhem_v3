@@ -17,6 +17,7 @@ const dark = {
     main: colors.sky[900],
     hover: colors.sky[800],
     icon: colors.sky[900],
+    border: colors.sky[600],
   },
 };
 
@@ -28,6 +29,7 @@ const light: ThemeColors = {
     main: colors.blue[200],
     hover: colors.blue[300],
     icon: colors.blue[200],
+    border: colors.blue[400],
   },
 };
 

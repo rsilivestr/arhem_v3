@@ -2,11 +2,13 @@ import cuid from '@bugsnag/cuid';
 import { CheckIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { useMutation } from '@tanstack/react-query';
 import ky from 'ky';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
 import { required } from '@/constants';
 import { useEventDetails } from '@/hooks/useEventDetails';
+import { useEditorGrid } from '@/store/editor/grid';
 import { useSession } from '@/store/session';
 import { StepData } from '@/types';
 
@@ -17,10 +19,11 @@ import { TextField } from './TextField';
 type StepCreateFields = Omit<StepData, 'id' | 'event_id' | 'image'>;
 
 export function StepCreateForm() {
+  const { activeCell } = useEditorGrid();
   const { event } = useEventDetails();
   const { token } = useSession();
 
-  const { handleSubmit, register } = useForm<StepCreateFields>();
+  const { handleSubmit, register, setValue } = useForm<StepCreateFields>();
   const {
     isError,
     isIdle,
@@ -57,6 +60,18 @@ export function StepCreateForm() {
     createStep(data);
   });
 
+  useEffect(() => {
+    if (activeCell?.col) {
+      setValue('col', activeCell.col);
+    }
+  }, [activeCell?.col, setValue]);
+
+  useEffect(() => {
+    if (activeCell?.row) {
+      setValue('row', activeCell.row);
+    }
+  }, [activeCell?.row, setValue]);
+
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
       <TextField label="Название" {...register('name', { required })} />
@@ -70,7 +85,7 @@ export function StepCreateForm() {
           step={1}
           min={1}
           max={999}
-          defaultValue={1}
+          defaultValue={activeCell?.col}
           {...register('col', { valueAsNumber: true })}
         />
         <TextField
@@ -80,7 +95,7 @@ export function StepCreateForm() {
           step={1}
           min={1}
           max={999}
-          defaultValue={1}
+          defaultValue={activeCell?.row}
           {...register('row', { valueAsNumber: true })}
         />
         <button

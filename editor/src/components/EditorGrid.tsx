@@ -17,14 +17,14 @@ const rowOffset = EDITOR_CELL_HEIGHT + EDITOR_GRID_GAP_Y;
 export function EditorGrid() {
   const grid = useEditorGrid();
   const cells = useMemo(
-    () => Array(grid.columns * grid.rows).fill(null),
-    [grid.columns, grid.rows]
+    () => Array(grid.cols * grid.rows).fill(null),
+    [grid.cols, grid.rows]
   );
 
   return (
     <Container x={EDITOR_PADDING} y={EDITOR_PADDING}>
       {cells.map((c, index) => {
-        const colIndex = index % grid.columns;
+        const colIndex = index % grid.cols;
         const rowIndex = Math.floor(index / grid.rows);
         return (
           <EditorGridCell
