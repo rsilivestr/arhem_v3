@@ -77,6 +77,10 @@ export function StepCreateForm() {
       <TextField label="Название" {...register('name', { required })} />
       <TextField label="Код" {...register('code', { required })} />
       <TextareaField label="Текст" {...register('text')} />
+      <label className="self-start">
+        <input type="checkbox" {...register('start')} />
+        <span className="pl-2 text-xs font-bold">Cтартовый</span>
+      </label>
       <div className="flex gap-2">
         <TextField
           className="grow"
