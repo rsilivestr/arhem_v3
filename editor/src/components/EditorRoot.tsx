@@ -2,10 +2,12 @@ import { Sprite, Stage } from '@pixi/react';
 import { Texture } from 'pixi.js';
 
 import { EditorView } from '@/components/EditorView';
+import { useEventDetails } from '@/hooks/useEventDetails';
 import { useElementSize } from '@/hooks/useResizeObserver';
 import { useTheme } from '@/hooks/useTheme';
 
 export function EditorRoot() {
+  const { event } = useEventDetails();
   const { ref, width, height } = useElementSize();
   const { colors } = useTheme();
 
@@ -28,7 +30,7 @@ export function EditorRoot() {
           texture={Texture.WHITE}
           tint={colors.bg}
         />
-        <EditorView />
+        {event && <EditorView />}
       </Stage>
     </div>
   );
