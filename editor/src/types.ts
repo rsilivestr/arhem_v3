@@ -18,11 +18,9 @@ export type GameEvent = EventData & EventMeta;
 
 export type EventsRespose = Array<GameEvent>;
 
-export type EventStep = unknown; // TODO
-
 export type EventDetailsResponse = {
   event: GameEvent;
-  steps: EventStep[];
+  steps: GameEventSteps;
 };
 
 export type StepData = {
@@ -44,3 +42,8 @@ export type StepMeta = {
 };
 
 export type GameStep = StepData & StepMeta;
+
+export type GameEventSteps = Array<{
+  step: GameStep;
+  links: unknown; // TODO
+}>;

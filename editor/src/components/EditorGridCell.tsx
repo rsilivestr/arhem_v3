@@ -1,13 +1,16 @@
-import { Container, Graphics } from '@pixi/react';
+import { Container, Graphics, Text } from '@pixi/react';
+import { TextMetrics, TextStyle } from 'pixi.js';
 import { useState } from 'react';
 
 import {
   EDITOR_CELL_HEIGHT,
+  EDITOR_CELL_PADDING,
   EDITOR_CELL_RADIUS,
   EDITOR_CELL_WIDTH,
 } from '@/config';
 import { useTheme } from '@/hooks/useTheme';
 import { useEditorGrid } from '@/store/editor/grid';
+import { GameStep } from '@/types';
 
 const ICON_SIZE = Math.ceil(EDITOR_CELL_HEIGHT / 2.5);
 const ICON_STROKE = Math.ceil(ICON_SIZE / 10);
@@ -21,13 +24,22 @@ type Props = {
   // TODO set url search params
   col: number;
   row: number;
+  step: GameStep | null;
 };
 
-export function EditorGridCell({ x, y, col, row }: Props) {
+const styles = {
+  address: new TextStyle({ fontSize: 16, fill: '#abc' }),
+  name: new TextStyle({ fontSize: 16, fontWeight: '700', fill: '#fff' }),
+};
+
+export function EditorGridCell({ x, y, col, row, step }: Props) {
   const { colors } = useTheme();
   const { activeCell, setActiveCell } = useEditorGrid();
   const [isHovered, setIsHovered] = useState(false);
   const isSelected = col === activeCell?.col && row === activeCell?.row;
+
+  const cellAddress = `${col} : ${row}`;
+  const addressSize = TextMetrics.measureText(cellAddress, styles.address);
 
   return (
     <Container x={x} y={y}>
@@ -68,6 +80,20 @@ export function EditorGridCell({ x, y, col, row }: Props) {
         }}
         eventMode="none"
       />
+      <Text
+        x={EDITOR_CELL_WIDTH - (EDITOR_CELL_PADDING + addressSize.width)}
+        y={EDITOR_CELL_PADDING}
+        text={cellAddress}
+        style={styles.address}
+      />
+      {step && (
+        <Text
+          x={EDITOR_CELL_PADDING}
+          y={EDITOR_CELL_PADDING}
+          text={step.name}
+          style={styles.name}
+        />
+      )}
     </Container>
   );
 }
