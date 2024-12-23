@@ -1,3 +1,4 @@
+import cuid from '@bugsnag/cuid';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
@@ -6,92 +7,108 @@ import { useForm } from 'react-hook-form';
 
 import { API_BASE_URL } from '@/config';
 import { required } from '@/constants';
+import { useEventDetails } from '@/hooks/useEventDetails';
+import { useEditorGrid } from '@/store/editor/grid';
 import { useSession } from '@/store/session';
-import { EventData, GameEvent } from '@/types';
+import { StepData } from '@/types';
 
 import { FloppyIcon } from './icons/FloppyIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { TextareaField } from './TextareaField';
 import { TextField } from './TextField';
 
-type EventEditFields = Omit<EventData, 'id'>;
+type StepCreateFields = Omit<StepData, 'id' | 'event_id' | 'image'>;
 
-type Props = {
-  event: GameEvent;
-};
-
-export function EventEditForm({ event }: Props) {
-  const { token } = useSession();
-  const { handleSubmit, register, setValue } = useForm<EventEditFields>({
-    defaultValues: { ...event },
-  });
+export function StepEditForm() {
   const queryClient = useQueryClient();
+  const { activeCell, activeStep } = useEditorGrid();
+  const { event } = useEventDetails();
+  const { token } = useSession();
 
+  const { handleSubmit, register, setValue } = useForm<StepCreateFields>();
   const {
-    error,
     isError,
     isIdle,
     isPending,
     isSuccess,
-    mutate: createEvent,
+    mutate: createStep,
   } = useMutation({
-    mutationFn: async (data: EventEditFields) => {
+    mutationFn: async (data: StepCreateFields) => {
       if (!token) {
         throw new Error('Залогиньтесь');
       }
-      return await ky.post(`${API_BASE_URL}/events`, {
+      if (!event) {
+        throw new Error('Нельзя создать шаг без ивента');
+      }
+      return await ky.post(`${API_BASE_URL}/event_step`, {
         headers: { token },
         json: {
+          id: cuid(),
+          event_id: event.id,
+          image: null,
           ...data,
-          id: event.id,
         },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['events', event!.id] });
     },
   });
 
-  useEffect(() => {
-    if (!event) {
-      return;
-    }
-    setValue('name', event.name);
-    setValue('code', event.code);
-    setValue('description', event.description);
-    setValue('max_cols', event.max_cols);
-    setValue('max_rows', event.max_rows);
-  }, [event, setValue]);
-
   const onSubmit = handleSubmit((data) => {
-    createEvent(data);
+    createStep(data);
   });
+
+  useEffect(() => {
+    if (activeCell?.col) {
+      setValue('col', activeCell.col);
+    }
+  }, [activeCell?.col, setValue]);
+
+  useEffect(() => {
+    if (activeCell?.row) {
+      setValue('row', activeCell.row);
+    }
+  }, [activeCell?.row, setValue]);
+
+  useEffect(() => {
+    if (activeStep) {
+      setValue('name', activeStep.name);
+      setValue('code', activeStep.code);
+      setValue('text', activeStep.text);
+      setValue('start', !!activeStep.start);
+    }
+  }, [activeStep, setValue]);
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
       <TextField label="Название" {...register('name', { required })} />
       <TextField label="Код" {...register('code', { required })} />
-      <TextareaField label="Описание" {...register('description')} />
+      <TextareaField label="Текст" {...register('text')} />
+      <label className="self-start">
+        <input type="checkbox" {...register('start')} />
+        <span className="pl-2 text-xs font-bold">Cтартовый</span>
+      </label>
       <div className="flex gap-2">
         <TextField
           className="grow"
-          label="Колонок"
+          label="Колонка"
           type="number"
           step={1}
           min={1}
           max={999}
-          defaultValue={5}
-          {...register('max_cols', { valueAsNumber: true })}
+          defaultValue={activeCell?.col}
+          {...register('col', { valueAsNumber: true })}
         />
         <TextField
           className="grow"
-          label="Строк"
+          label="Строка"
           type="number"
           step={1}
           min={1}
           max={999}
-          defaultValue={5}
-          {...register('max_rows', { valueAsNumber: true })}
+          defaultValue={activeCell?.row}
+          {...register('row', { valueAsNumber: true })}
         />
         <button
           className="h-8 pl-8 pr-2 self-end relative flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700"
@@ -104,14 +121,9 @@ export function EventEditForm({ event }: Props) {
             {isSuccess && <CheckIcon className="w-5 h-5" />}
             {isError && <Cross2Icon className="w-5 h-5" />}
           </span>
-          <span className="pl">Сохранить</span>
+          <span>Сохранить</span>
         </button>
       </div>
-      {isError && (
-        <p className="max-w-[368px] text-sm mt-5 text-red-500">
-          {error.message}
-        </p>
-      )}
     </form>
   );
 }

@@ -2,12 +2,12 @@ import { create } from 'zustand';
 
 type SidebarState = {
   isOpen: boolean;
-  toggle(): void;
+  toggleOpen(): void;
 };
 
 export const useSidebarState = create<SidebarState>((set) => ({
   isOpen: true,
-  toggle() {
+  toggleOpen() {
     set((prev) => ({ isOpen: !prev.isOpen }));
   },
 }));

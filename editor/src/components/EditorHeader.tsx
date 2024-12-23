@@ -17,7 +17,7 @@ export function EditorHeader() {
         title={sidebarToggleLabel}
         className="bg-slate-350 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700"
         type="button"
-        onClick={sidebar.toggle}
+        onClick={sidebar.toggleOpen}
       >
         <ViewVerticalIcon className="h-10 w-10 p-2" />
       </button>
