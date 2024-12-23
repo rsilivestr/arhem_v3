@@ -1,5 +1,5 @@
 import cuid from '@bugsnag/cuid';
-import { CheckIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
+import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ky from 'ky';
 import { useEffect } from 'react';
@@ -12,15 +12,16 @@ import { useEditorGrid } from '@/store/editor/grid';
 import { useSession } from '@/store/session';
 import { StepData } from '@/types';
 
+import { FloppyIcon } from './icons/FloppyIcon';
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { TextareaField } from './TextareaField';
 import { TextField } from './TextField';
 
 type StepCreateFields = Omit<StepData, 'id' | 'event_id' | 'image'>;
 
-export function StepCreateForm() {
+export function StepEditForm() {
   const queryClient = useQueryClient();
-  const { activeCell } = useEditorGrid();
+  const { activeCell, activeStep } = useEditorGrid();
   const { event } = useEventDetails();
   const { token } = useSession();
 
@@ -70,6 +71,15 @@ export function StepCreateForm() {
     }
   }, [activeCell?.row, setValue]);
 
+  useEffect(() => {
+    if (activeStep) {
+      setValue('name', activeStep.name);
+      setValue('code', activeStep.code);
+      setValue('text', activeStep.text);
+      setValue('start', !!activeStep.start);
+    }
+  }, [activeStep, setValue]);
+
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
       <TextField label="Название" {...register('name', { required })} />
@@ -106,12 +116,12 @@ export function StepCreateForm() {
           type="submit"
         >
           <span className="absolute left-2">
-            {isIdle && <PlusIcon className="w-5 h-5" />}
+            {isIdle && <FloppyIcon className="w-5 h-5" />}
             {isPending && <SpinnerIcon className="w-5 h-5 animate-spin" />}
             {isSuccess && <CheckIcon className="w-5 h-5" />}
             {isError && <Cross2Icon className="w-5 h-5" />}
           </span>
-          <span>Создать</span>
+          <span>Сохранить</span>
         </button>
       </div>
     </form>

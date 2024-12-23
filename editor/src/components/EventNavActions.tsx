@@ -12,6 +12,7 @@ import { useEditorGrid } from '@/store/editor/grid';
 import { EventCreateForm } from './EventCreateForm';
 import { EventEditForm } from './EventEditForm';
 import { StepCreateForm } from './StepCreateForm';
+import { StepEditForm } from './StepEditForm';
 import { TextField } from './TextField';
 
 type Props = {
@@ -37,7 +38,11 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
 
   useEffect(() => {
     if (activeCell) {
-      if (!activeStep) setTab('step-create');
+      if (!activeStep) {
+        setTab('step-create');
+      } else {
+        setTab('step-edit');
+      }
     }
   }, [activeCell, activeStep]);
 
@@ -88,6 +93,24 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
         >
           <PlusIcon className="h-10 w-10 p-2" />
         </Tabs.Trigger>
+        <Tabs.Trigger
+          disabled={!activeStep}
+          value="step-edit"
+          aria-label={
+            activeStep
+              ? 'Редактировать шаг'
+              : 'Не выбран шаг для редактирования'
+          }
+          title={
+            activeStep
+              ? 'Редактировать шаг'
+              : 'Не выбран шаг для редактирования'
+          }
+          className="data-[state=active]:bg-slate-300 enabled:hover:bg-slate-400 dark:data-[state=active]:bg-slate-900 enabled:dark:hover:bg-slate-700 disabled:cursor-not-allowed"
+          onPointerDown={handleTabPointerDown}
+        >
+          <Pencil1Icon className="h-10 w-10 p-2 " />
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="event-create" className="p-4">
         <EventCreateForm />
@@ -104,6 +127,9 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
       </Tabs.Content>
       <Tabs.Content value="step-create" className="p-4">
         <StepCreateForm />
+      </Tabs.Content>
+      <Tabs.Content value="step-edit" className="p-4">
+        <StepEditForm />
       </Tabs.Content>
     </Tabs.Root>
   );

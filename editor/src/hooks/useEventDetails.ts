@@ -34,7 +34,6 @@ export function useEventDetails() {
     if (data) {
       setEvent(data.event);
       setSteps(data.steps);
-      console.log(data.steps);
     }
   }, [data]);
 

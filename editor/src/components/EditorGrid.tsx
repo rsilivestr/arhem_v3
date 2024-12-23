@@ -23,9 +23,7 @@ export function EditorGrid() {
     }
     const _cells = Array(grid.event.max_cols * grid.event.max_rows).fill(null);
     grid.steps.forEach(({ step }) => {
-      console.log(step);
       const stepIndex = (step.row - 1) * grid.event!.max_cols + (step.col - 1);
-      console.log(stepIndex);
       _cells[stepIndex] = step;
     });
     return _cells;
