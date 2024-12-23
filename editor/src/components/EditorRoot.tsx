@@ -23,6 +23,10 @@ export function EditorRoot() {
           antialias: true,
           eventMode: 'static',
         }}
+        onMount={(app) => {
+          /* @ts-expect-error expose pixi app to devtools */
+          globalThis.__PIXI_APP__ = app;
+        }}
       >
         <Sprite
           width={width}
