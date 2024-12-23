@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from '@pixi/react';
-import { TextMetrics, TextStyle } from 'pixi.js';
+import { TextStyle } from 'pixi.js';
 import { useState } from 'react';
 
 import {
@@ -17,19 +17,40 @@ const ICON_STROKE = Math.ceil(ICON_SIZE / 10);
 const STROKE_OFFSET = (ICON_SIZE - ICON_STROKE) / 2;
 const ICON_TOP = (EDITOR_CELL_HEIGHT - ICON_SIZE) / 2;
 const ICON_LEFT = (EDITOR_CELL_WIDTH - ICON_SIZE) / 2;
+const LINE_OFFSET = 28;
 
 type Props = {
   x: number;
   y: number;
-  // TODO set url search params
   col: number;
   row: number;
   step: GameStep | null;
 };
 
 const styles = {
-  address: new TextStyle({ fontSize: 16, fill: '#abc' }),
-  name: new TextStyle({ fontSize: 16, fontWeight: '700', fill: '#fff' }),
+  address: new TextStyle({
+    fontSize: 12,
+    lineHeight: 24,
+    fill: '#abc',
+  }),
+  name: new TextStyle({
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '700',
+    fill: '#fff',
+  }),
+  code: new TextStyle({
+    fontSize: 16,
+    lineHeight: 24,
+    fill: '#bcd',
+  }),
+  text: new TextStyle({
+    fontSize: 16,
+    lineHeight: 24,
+    fill: '#fff',
+    wordWrap: true,
+    wordWrapWidth: EDITOR_CELL_WIDTH - 2 * EDITOR_CELL_PADDING,
+  }),
 };
 
 export function EditorGridCell({ x, y, col, row, step }: Props) {
@@ -37,9 +58,6 @@ export function EditorGridCell({ x, y, col, row, step }: Props) {
   const { activeCell, setActiveCell } = useEditorGrid();
   const [isHovered, setIsHovered] = useState(false);
   const isSelected = col === activeCell?.col && row === activeCell?.row;
-
-  const cellAddress = `${col} : ${row}`;
-  const addressSize = TextMetrics.measureText(cellAddress, styles.address);
 
   return (
     <Container x={x} y={y}>
@@ -68,30 +86,50 @@ export function EditorGridCell({ x, y, col, row, step }: Props) {
           }
         }}
       />
-      <Graphics
-        x={ICON_LEFT}
-        y={ICON_TOP}
-        draw={(g) => {
-          g.clear();
-          g.beginFill(colors.cell.icon);
-          g.drawRect(STROKE_OFFSET, 0, ICON_STROKE, ICON_SIZE);
-          g.drawRect(0, STROKE_OFFSET, ICON_SIZE, ICON_STROKE);
-          g.endFill();
-        }}
+      <Text
+        x={EDITOR_CELL_WIDTH - EDITOR_CELL_PADDING}
+        y={EDITOR_CELL_PADDING}
+        anchor={[1, 0]}
+        text={`${col} : ${row}`}
+        style={styles.address}
         eventMode="none"
       />
-      <Text
-        x={EDITOR_CELL_WIDTH - (EDITOR_CELL_PADDING + addressSize.width)}
-        y={EDITOR_CELL_PADDING}
-        text={cellAddress}
-        style={styles.address}
-      />
-      {step && (
-        <Text
-          x={EDITOR_CELL_PADDING}
-          y={EDITOR_CELL_PADDING}
-          text={step.name}
-          style={styles.name}
+      {step ? (
+        <>
+          <Text
+            x={EDITOR_CELL_PADDING}
+            y={EDITOR_CELL_PADDING}
+            text={step.name}
+            style={styles.name}
+            eventMode="none"
+          />
+          <Text
+            x={EDITOR_CELL_PADDING}
+            y={EDITOR_CELL_PADDING + LINE_OFFSET}
+            text={step.code}
+            style={styles.code}
+            eventMode="none"
+          />
+          <Text
+            x={EDITOR_CELL_PADDING}
+            y={EDITOR_CELL_PADDING + 2 * LINE_OFFSET}
+            text={step.text}
+            style={styles.text}
+            eventMode="none"
+          />
+        </>
+      ) : (
+        <Graphics
+          x={ICON_LEFT}
+          y={ICON_TOP}
+          draw={(g) => {
+            g.clear();
+            g.beginFill(colors.cell.icon);
+            g.drawRect(STROKE_OFFSET, 0, ICON_STROKE, ICON_SIZE);
+            g.drawRect(0, STROKE_OFFSET, ICON_SIZE, ICON_STROKE);
+            g.endFill();
+          }}
+          eventMode="none"
         />
       )}
     </Container>
