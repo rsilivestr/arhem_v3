@@ -21,7 +21,7 @@ type Props = {
 
 export function EventNavActions({ filterTerm, onFilterChange }: Props) {
   const { event } = useEventDetails();
-  const { activeCell } = useEditorGrid();
+  const { activeCell, activeStep } = useEditorGrid();
   const [tab, setTab] = useState('none');
 
   const handleTabPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -37,9 +37,9 @@ export function EventNavActions({ filterTerm, onFilterChange }: Props) {
 
   useEffect(() => {
     if (activeCell) {
-      setTab('step-create');
+      if (!activeStep) setTab('step-create');
     }
-  }, [activeCell]);
+  }, [activeCell, activeStep]);
 
   // TODO reset tab on redirect from event
 

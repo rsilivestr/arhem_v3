@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { EventDetailsResponse, GameEvent } from '@/types';
+import { EventDetailsResponse, GameEvent, GameStep } from '@/types';
 
 type Cell = {
   col: number;
@@ -22,6 +22,9 @@ type EditorGrid = {
 
   steps: EventDetailsResponse['steps'];
   setSteps(steps: EventDetailsResponse['steps']): void;
+
+  activeStep: GameStep | null;
+  setActiveStep(step: GameStep | null): void;
 };
 
 const useEditorGrid = create<EditorGrid>((set) => ({
@@ -62,6 +65,11 @@ const useEditorGrid = create<EditorGrid>((set) => ({
   steps: [],
   setSteps(steps) {
     set({ steps });
+  },
+
+  activeStep: null,
+  setActiveStep(activeStep) {
+    set({ activeStep });
   },
 }));
 
