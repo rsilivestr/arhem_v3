@@ -86,8 +86,8 @@ export function EventEditForm({ event }: Props) {
 }
 
 function useEventEditMutation(event: GameEvent) {
-  const { token } = useSession();
   const queryClient = useQueryClient();
+  const { token } = useSession();
 
   return useMutation({
     mutationFn: async (data: EventEditFields) => {

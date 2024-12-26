@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { API_BASE_URL } from '@/config';
 import { required } from '@/constants';
 import { useEventDetails } from '@/hooks/useEventDetails';
-import { Cell, useEditorGrid } from '@/store/editor/grid';
+import { useEditorGrid } from '@/store/editor/grid';
 import { useSession } from '@/store/session';
 import { StepData } from '@/types';
 
@@ -27,7 +27,7 @@ export function StepCreateForm() {
     isSuccess,
     mutate: createStep,
   } = useStepCreateMutation();
-  const { handleSubmit, register } = useStepCreateForm(activeCell);
+  const { handleSubmit, register } = useStepCreateForm();
 
   const onSubmit = handleSubmit((data) => {
     createStep(data);
@@ -110,7 +110,8 @@ function useStepCreateMutation() {
   });
 }
 
-function useStepCreateForm(activeCell: Cell | null) {
+function useStepCreateForm() {
+  const { activeCell } = useEditorGrid();
   const formMethods = useForm<StepCreateFields>();
   const { setValue } = formMethods;
 

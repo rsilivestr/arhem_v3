@@ -20,65 +20,19 @@ import { TextField } from './TextField';
 type StepCreateFields = Omit<StepData, 'id' | 'event_id' | 'image'>;
 
 export function StepEditForm() {
-  const queryClient = useQueryClient();
-  const { activeCell, activeStep } = useEditorGrid();
-  const { event } = useEventDetails();
-  const { token } = useSession();
-
-  const { handleSubmit, register, setValue } = useForm<StepCreateFields>();
+  const { activeCell } = useEditorGrid();
+  const { handleSubmit, register } = useStepEditForm();
   const {
     isError,
     isIdle,
     isPending,
     isSuccess,
     mutate: createStep,
-  } = useMutation({
-    mutationFn: async (data: StepCreateFields) => {
-      if (!token) {
-        throw new Error('Залогиньтесь');
-      }
-      if (!event) {
-        throw new Error('Нельзя создать шаг без ивента');
-      }
-      return await ky.post(`${API_BASE_URL}/event_step`, {
-        headers: { token },
-        json: {
-          id: cuid(),
-          event_id: event.id,
-          image: null,
-          ...data,
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', event!.id] });
-    },
-  });
+  } = useStepEditMutation();
 
   const onSubmit = handleSubmit((data) => {
     createStep(data);
   });
-
-  useEffect(() => {
-    if (activeCell?.col) {
-      setValue('col', activeCell.col);
-    }
-  }, [activeCell?.col, setValue]);
-
-  useEffect(() => {
-    if (activeCell?.row) {
-      setValue('row', activeCell.row);
-    }
-  }, [activeCell?.row, setValue]);
-
-  useEffect(() => {
-    if (activeStep) {
-      setValue('name', activeStep.name);
-      setValue('code', activeStep.code);
-      setValue('text', activeStep.text);
-      setValue('start', !!activeStep.start);
-    }
-  }, [activeStep, setValue]);
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
@@ -126,4 +80,62 @@ export function StepEditForm() {
       </div>
     </form>
   );
+}
+
+function useStepEditMutation() {
+  const queryClient = useQueryClient();
+  const { event } = useEventDetails();
+  const { token } = useSession();
+
+  return useMutation({
+    mutationFn: async (data: StepCreateFields) => {
+      if (!token) {
+        throw new Error('Залогиньтесь');
+      }
+      if (!event) {
+        throw new Error('Нельзя создать шаг без ивента');
+      }
+      return await ky.post(`${API_BASE_URL}/event_step`, {
+        headers: { token },
+        json: {
+          id: cuid(),
+          event_id: event.id,
+          image: null,
+          ...data,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events', event!.id] });
+    },
+  });
+}
+
+function useStepEditForm() {
+  const { activeCell, activeStep } = useEditorGrid();
+  const formMethods = useForm<StepCreateFields>();
+  const { setValue } = formMethods;
+
+  useEffect(() => {
+    if (activeStep) {
+      setValue('name', activeStep.name);
+      setValue('code', activeStep.code);
+      setValue('text', activeStep.text);
+      setValue('start', !!activeStep.start);
+    }
+  }, [activeStep, setValue]);
+
+  useEffect(() => {
+    if (activeCell?.col) {
+      setValue('col', activeCell.col);
+    }
+  }, [activeCell?.col, setValue]);
+
+  useEffect(() => {
+    if (activeCell?.row) {
+      setValue('row', activeCell.row);
+    }
+  }, [activeCell?.row, setValue]);
+
+  return formMethods;
 }

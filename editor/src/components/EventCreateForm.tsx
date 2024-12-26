@@ -85,8 +85,8 @@ export function EventCreateForm() {
 }
 
 function useEventCreateMutation({ onSuccess }: MutationCallbacks) {
-  const { token } = useSession();
   const queryClient = useQueryClient();
+  const { token } = useSession();
 
   return useMutation({
     mutationFn: async (data: EventCreateFields) => {
