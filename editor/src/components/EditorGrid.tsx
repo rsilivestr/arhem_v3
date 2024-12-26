@@ -16,18 +16,7 @@ const colOffset = EDITOR_CELL_WIDTH + EDITOR_GRID_GAP_X;
 const rowOffset = EDITOR_CELL_HEIGHT + EDITOR_GRID_GAP_Y;
 
 export function EditorGrid() {
-  const grid = useEditorGrid();
-  const cells: (GameStep | null)[] = useMemo(() => {
-    if (!grid.event) {
-      return [];
-    }
-    const _cells = Array(grid.event.max_cols * grid.event.max_rows).fill(null);
-    grid.steps.forEach(({ step }) => {
-      const stepIndex = (step.row - 1) * grid.event!.max_cols + (step.col - 1);
-      _cells[stepIndex] = step;
-    });
-    return _cells;
-  }, [grid.event, grid.steps]);
+  const { cells, grid } = useGridCells();
 
   return (
     <Container x={EDITOR_PADDING} y={EDITOR_PADDING}>
@@ -48,4 +37,24 @@ export function EditorGrid() {
         })}
     </Container>
   );
+}
+
+function useGridCells() {
+  const grid = useEditorGrid();
+  const cells: (GameStep | null)[] = useMemo(() => {
+    if (!grid.event) {
+      return [];
+    }
+    const _cells = Array(grid.event.max_cols * grid.event.max_rows).fill(null);
+    grid.steps.forEach(({ step }) => {
+      const stepIndex = (step.row - 1) * grid.event!.max_cols + (step.col - 1);
+      _cells[stepIndex] = step;
+    });
+    return _cells;
+  }, [grid.event, grid.steps]);
+
+  return {
+    cells,
+    grid,
+  };
 }
