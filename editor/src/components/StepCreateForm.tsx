@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { API_BASE_URL } from '@/config';
 import { required } from '@/constants';
 import { useEventDetails } from '@/hooks/useEventDetails';
-import { useEditorGrid } from '@/store/editor/grid';
+import { Cell, useEditorGrid } from '@/store/editor/grid';
 import { useSession } from '@/store/session';
 import { StepData } from '@/types';
 
@@ -19,56 +19,19 @@ import { TextField } from './TextField';
 type StepCreateFields = Omit<StepData, 'id' | 'event_id' | 'image'>;
 
 export function StepCreateForm() {
-  const queryClient = useQueryClient();
   const { activeCell } = useEditorGrid();
-  const { event } = useEventDetails();
-  const { token } = useSession();
-
-  const { handleSubmit, register, setValue } = useForm<StepCreateFields>();
   const {
     isError,
     isIdle,
     isPending,
     isSuccess,
     mutate: createStep,
-  } = useMutation({
-    mutationFn: async (data: StepCreateFields) => {
-      if (!token) {
-        throw new Error('Залогиньтесь');
-      }
-      if (!event) {
-        throw new Error('Нельзя создать шаг без ивента');
-      }
-      return await ky.post(`${API_BASE_URL}/event_step`, {
-        headers: { token },
-        json: {
-          id: cuid(),
-          event_id: event.id,
-          image: null,
-          ...data,
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', event!.id] });
-    },
-  });
+  } = useStepCreateMutation();
+  const { handleSubmit, register } = useStepCreateForm(activeCell);
 
   const onSubmit = handleSubmit((data) => {
     createStep(data);
   });
-
-  useEffect(() => {
-    if (activeCell?.col) {
-      setValue('col', activeCell.col);
-    }
-  }, [activeCell?.col, setValue]);
-
-  useEffect(() => {
-    if (activeCell?.row) {
-      setValue('row', activeCell.row);
-    }
-  }, [activeCell?.row, setValue]);
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2 items-stretch">
@@ -77,7 +40,7 @@ export function StepCreateForm() {
       <TextareaField label="Текст" {...register('text')} />
       <label className="self-start">
         <input type="checkbox" {...register('start')} />
-        <span className="pl-2 text-xs font-bold">Cтартовый</span>
+        <span className="pl-2 text-xs font-bold">Стартовый</span>
       </label>
       <div className="flex gap-2">
         <TextField
@@ -116,4 +79,52 @@ export function StepCreateForm() {
       </div>
     </form>
   );
+}
+
+function useStepCreateMutation() {
+  const queryClient = useQueryClient();
+  const { event } = useEventDetails();
+  const { token } = useSession();
+
+  return useMutation({
+    mutationFn: async (data: StepCreateFields) => {
+      if (!token) {
+        throw new Error('Залогиньтесь');
+      }
+      if (!event) {
+        throw new Error('Нельзя создать шаг без ивента');
+      }
+      return await ky.post(`${API_BASE_URL}/event_step`, {
+        headers: { token },
+        json: {
+          id: cuid(),
+          event_id: event.id,
+          image: null,
+          ...data,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events', event!.id] });
+    },
+  });
+}
+
+function useStepCreateForm(activeCell: Cell | null) {
+  const formMethods = useForm<StepCreateFields>();
+  const { setValue } = formMethods;
+
+  useEffect(() => {
+    if (activeCell?.col) {
+      setValue('col', activeCell.col);
+    }
+  }, [activeCell?.col, setValue]);
+
+  useEffect(() => {
+    if (activeCell?.row) {
+      setValue('row', activeCell.row);
+    }
+  }, [activeCell?.row, setValue]);
+
+  return formMethods;
 }

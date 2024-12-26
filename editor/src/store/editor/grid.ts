@@ -45,3 +45,4 @@ const useEditorGrid = create<EditorGrid>((set) => ({
 }));
 
 export { useEditorGrid };
+export type { Cell };
