@@ -47,3 +47,8 @@ export type GameEventSteps = Array<{
   step: GameStep;
   links: unknown; // TODO
 }>;
+
+export type MutationCallbacks = {
+  onError?(): void;
+  onSuccess?(): void;
+};

@@ -30,7 +30,7 @@ export function EventEditForm({ event }: Props) {
     isPending,
     isSuccess,
     mutate: createEvent,
-  } = useEditMutation(event);
+  } = useEventEditMutation(event);
 
   const onSubmit = handleSubmit((data) => {
     createEvent(data);
@@ -85,7 +85,7 @@ export function EventEditForm({ event }: Props) {
   );
 }
 
-function useEditMutation(event: GameEvent) {
+function useEventEditMutation(event: GameEvent) {
   const { token } = useSession();
   const queryClient = useQueryClient();
 

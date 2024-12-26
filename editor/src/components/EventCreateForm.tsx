@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { API_BASE_URL } from '@/config';
 import { required } from '@/constants';
 import { useSession } from '@/store/session';
-import { EventData } from '@/types';
+import { EventData, MutationCallbacks } from '@/types';
 
 import { SpinnerIcon } from './icons/SpinnerIcon';
 import { TextareaField } from './TextareaField';
@@ -16,9 +16,7 @@ import { TextField } from './TextField';
 type EventCreateFields = Omit<EventData, 'id'>;
 
 export function EventCreateForm() {
-  const { token } = useSession();
   const { handleSubmit, register, reset } = useForm<EventCreateFields>();
-  const queryClient = useQueryClient();
 
   const {
     error,
@@ -27,22 +25,9 @@ export function EventCreateForm() {
     isPending,
     isSuccess,
     mutate: createEvent,
-  } = useMutation({
-    mutationFn: async (data: EventCreateFields) => {
-      if (!token) {
-        throw new Error('Залогиньтесь');
-      }
-      return await ky.post(`${API_BASE_URL}/events`, {
-        headers: { token },
-        json: {
-          ...data,
-          id: cuid(),
-        },
-      });
-    },
+  } = useEventCreateMutation({
     onSuccess: () => {
       reset();
-      queryClient.invalidateQueries({ queryKey: ['events'] });
     },
   });
 
@@ -97,4 +82,28 @@ export function EventCreateForm() {
       )}
     </form>
   );
+}
+
+function useEventCreateMutation({ onSuccess }: MutationCallbacks) {
+  const { token } = useSession();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: EventCreateFields) => {
+      if (!token) {
+        throw new Error('Залогиньтесь');
+      }
+      return await ky.post(`${API_BASE_URL}/events`, {
+        headers: { token },
+        json: {
+          ...data,
+          id: cuid(),
+        },
+      });
+    },
+    onSuccess: () => {
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
 }
