@@ -21,11 +21,7 @@ type Props = {
 };
 
 export function EventEditForm({ event }: Props) {
-  const { token } = useSession();
-  const { handleSubmit, register, setValue } = useForm<EventEditFields>({
-    defaultValues: { ...event },
-  });
-  const queryClient = useQueryClient();
+  const { handleSubmit, register } = useEditForm(event);
 
   const {
     error,
@@ -34,34 +30,7 @@ export function EventEditForm({ event }: Props) {
     isPending,
     isSuccess,
     mutate: createEvent,
-  } = useMutation({
-    mutationFn: async (data: EventEditFields) => {
-      if (!token) {
-        throw new Error('Залогиньтесь');
-      }
-      return await ky.post(`${API_BASE_URL}/events`, {
-        headers: { token },
-        json: {
-          ...data,
-          id: event.id,
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-    },
-  });
-
-  useEffect(() => {
-    if (!event) {
-      return;
-    }
-    setValue('name', event.name);
-    setValue('code', event.code);
-    setValue('description', event.description);
-    setValue('max_cols', event.max_cols);
-    setValue('max_rows', event.max_rows);
-  }, [event, setValue]);
+  } = useEditMutation(event);
 
   const onSubmit = handleSubmit((data) => {
     createEvent(data);
@@ -114,4 +83,47 @@ export function EventEditForm({ event }: Props) {
       )}
     </form>
   );
+}
+
+function useEditMutation(event: GameEvent) {
+  const { token } = useSession();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: EventEditFields) => {
+      if (!token) {
+        throw new Error('Залогиньтесь');
+      }
+      return await ky.post(`${API_BASE_URL}/events`, {
+        headers: { token },
+        json: {
+          ...data,
+          id: event.id,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+}
+
+function useEditForm(event: GameEvent) {
+  const formMethods = useForm<EventEditFields>({
+    defaultValues: { ...event },
+  });
+  const { setValue } = formMethods;
+
+  useEffect(() => {
+    if (!event) {
+      return;
+    }
+    setValue('name', event.name);
+    setValue('code', event.code);
+    setValue('description', event.description);
+    setValue('max_cols', event.max_cols);
+    setValue('max_rows', event.max_rows);
+  }, [event, setValue]);
+
+  return formMethods;
 }
